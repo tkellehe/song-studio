@@ -1,0 +1,5 @@
+title: Fumble
+description: A simple Code Golfing language that utilizes an LLM in order to execute.
+remote_theme: pages-themes/tactile@v0.2.0
+plugins:
+- jekyll-remote-theme # add this line to the plugins list if you already have one
