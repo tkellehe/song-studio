@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Embedding with TensorFlow.js and SOM</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+</head>
+<body>
+    <input id="search"></input>
+    <select id="sorting">
+        <option value="All">All</option>
+        <option value="Category">Category</option>
+        <option value="Descriptor">Descriptor</option>
+    </select>
+    <div id="output-locations">
+        <pre id="output"></pre>
+        <pre id="output-1"></pre>
+        <pre id="output-2"></pre>
+    </div>
+
+    <script>
+        let model;
+
+        async function getModel() {
+            if (!model) {
+                model = await use.load();
+                console.log('Model loaded');
+            }
+            return model
+        }
+
+        const DATA = [
+            {"tag": "Dance", "prompt": "Song Style of Danceable Dance", "category": "Style", "group": "Danceable"},
+            {"tag": "Festive", "prompt": "Song Style of Danceable Festive", "category": "Style", "group": "Danceable"},
+            {"tag": "Groovy", "prompt": "Song Style of Danceable Groovy", "category": "Style", "group": "Danceable"},
+            {"tag": "Mid-Tempo", "prompt": "Song Style of Danceable Mid-Tempo", "category": "Style", "group": "Danceable"},
+            {"tag": "Syncopated", "prompt": "Song Style of Danceable Syncopated", "category": "Style", "group": "Danceable"},
+            {"tag": "Tipsy", "prompt": "Song Style of Danceable Tipsy", "category": "Style", "group": "Danceable"},
+
+            {"tag": "Atmospheric", "prompt": "Song Style of Dark Atmospheric", "category": "Style", "group": "Dark"},
+            {"tag": "Cold", "prompt": "Song Style of Dark Cold", "category": "Style", "group": "Dark"},
+            {"tag": "Dark", "prompt": "Song Style of Dark Dark", "category": "Style", "group": "Dark"},
+            {"tag": "Doom", "prompt": "Song Style of Dark Doom", "category": "Style", "group": "Dark"},
+            {"tag": "Dramatic", "prompt": "Song Style of Dark Dramatic", "category": "Style", "group": "Dark"},
+            {"tag": "Sinister", "prompt": "Song Style of Dark Sinister", "category": "Style", "group": "Dark"},
+
+            {"tag": "Adjunct", "prompt": "Song Style of Eclectic Adjunct", "category": "Style", "group": "Eclectic"},
+            {"tag": "Art", "prompt": "Song Style of Eclectic Art", "category": "Style", "group": "Eclectic"},
+            {"tag": "Capriccio", "prompt": "Song Style of Eclectic Capriccio", "category": "Style", "group": "Eclectic"},
+            {"tag": "Mellifluous", "prompt": "Song Style of Eclectic Mellifluous", "category": "Style", "group": "Eclectic"},
+            {"tag": "Nü", "prompt": "Song Style of Eclectic Nü", "category": "Style", "group": "Eclectic"},
+            {"tag": "Progressive", "prompt": "Song Style of Eclectic Progressive", "category": "Style", "group": "Eclectic"},
+            {"tag": "Unusual", "prompt": "Song Style of Eclectic Unusual", "category": "Style", "group": "Eclectic"},
+
+            {"tag": "Anthemic", "prompt": "Song Style of Emotion Anthemic", "category": "Style", "group": "Emotion"},
+            {"tag": "Emotional", "prompt": "Song Style of Emotion Emotional", "category": "Style", "group": "Emotion"},
+            {"tag": "Happy", "prompt": "Song Style of Emotion Happy", "category": "Style", "group": "Emotion"},
+            {"tag": "Jubilant", "prompt": "Song Style of Emotion Jubilant", "category": "Style", "group": "Emotion"},
+            {"tag": "Melancholy", "prompt": "Song Style of Emotion Melancholy", "category": "Style", "group": "Emotion"},
+            {"tag": "Sad", "prompt": "Song Style of Emotion Sad", "category": "Style", "group": "Emotion"},
+
+            {"tag": "Aggressive", "prompt": "Song Style of Hard Aggressive", "category": "Style", "group": "Hard"},
+            {"tag": "Banger", "prompt": "Song Style of Hard Banger", "category": "Style", "group": "Hard"},
+            {"tag": "Power", "prompt": "Song Style of Hard Power", "category": "Style", "group": "Hard"},
+            {"tag": "Stadium", "prompt": "Song Style of Hard Stadium", "category": "Style", "group": "Hard"},
+            {"tag": "Stomp", "prompt": "Song Style of Hard Stomp", "category": "Style", "group": "Hard"},
+
+            {"tag": "Broadway", "prompt": "Song Style of Lyrical Broadway", "category": "Style", "group": "Lyrical"},
+            {"tag": "Cabaret", "prompt": "Song Style of Lyrical Cabaret", "category": "Style", "group": "Lyrical"},
+            {"tag": "Lounge", "prompt": "Song Style of Lyrical Lounge", "category": "Style", "group": "Lyrical"},
+            {"tag": "Operatic", "prompt": "Song Style of Lyrical Operatic", "category": "Style", "group": "Lyrical"},
+            {"tag": "Storytelling", "prompt": "Song Style of Lyrical Storytelling", "category": "Style", "group": "Lyrical"},
+            {"tag": "Torch-Lounge", "prompt": "Song Style of Lyrical Torch-Lounge", "category": "Style", "group": "Lyrical"},
+            {"tag": "Theatrical", "prompt": "Song Style of Lyrical Theatrical", "category": "Style", "group": "Lyrical"},
+            {"tag": "Troubadour", "prompt": "Song Style of Lyrical Troubadour", "category": "Style", "group": "Lyrical"},
+            {"tag": "Vegas", "prompt": "Song Style of Lyrical Vegas", "category": "Style", "group": "Lyrical"},
+
+            {"tag": "Ethereal", "prompt": "Song Style of Magical Ethereal", "category": "Style", "group": "Magical"},
+            {"tag": "Majestic", "prompt": "Song Style of Magical Majestic", "category": "Style", "group": "Magical"},
+            {"tag": "Mysterious", "prompt": "Song Style of Magical Mysterious", "category": "Style", "group": "Magical"},
+
+            {"tag": "Ambient", "prompt": "Song Style of Minimal Ambient", "category": "Style", "group": "Minimal"},
+            {"tag": "Cinematic", "prompt": "Song Style of Minimal Cinematic", "category": "Style", "group": "Minimal"},
+            {"tag": "Heat", "prompt": "Song Style of Minimal Heat", "category": "Style", "group": "Minimal"},
+            {"tag": "Minimal", "prompt": "Song Style of Minimal Minimal", "category": "Style", "group": "Minimal"},
+            {"tag": "Slow", "prompt": "Song Style of Minimal Slow", "category": "Style", "group": "Minimal"},
+            {"tag": "Sparse", "prompt": "Song Style of Minimal Sparse", "category": "Style", "group": "Minimal"},
+
+            {"tag": "German Schlager", "prompt": "Song Style of Party German Schlager", "category": "Style", "group": "Party"},
+            {"tag": "Glam", "prompt": "Song Style of Party Glam", "category": "Style", "group": "Party"},
+            {"tag": "Glitter", "prompt": "Song Style of Party Glitter", "category": "Style", "group": "Party"},
+            {"tag": "Groovy", "prompt": "Song Style of Party Groovy", "category": "Style", "group": "Party"},
+
+            {"tag": "Ambient", "prompt": "Song Style of Soft Ambient", "category": "Style", "group": "Soft"},
+            {"tag": "Bedroom", "prompt": "Song Style of Soft Bedroom", "category": "Style", "group": "Soft"},
+            {"tag": "Chillwave", "prompt": "Song Style of Soft Chillwave", "category": "Style", "group": "Soft"},
+            {"tag": "Ethereal", "prompt": "Song Style of Soft Ethereal", "category": "Style", "group": "Soft"},
+            {"tag": "Intimate", "prompt": "Song Style of Soft Intimate", "category": "Style", "group": "Soft"},
+            {"tag": "Heat", "prompt": "Song Style of Soft Heat", "category": "Style", "group": "Soft"},
+            {"tag": "Sadcore", "prompt": "Song Style of Soft Sadcore", "category": "Style", "group": "Soft"},
+
+            {"tag": "Carnival", "prompt": "Song Style of Weird Carnival", "category": "Style", "group": "Weird"},
+            {"tag": "Distorted", "prompt": "Song Style of Weird Distorted", "category": "Style", "group": "Weird"},
+            {"tag": "Glitchy", "prompt": "Song Style of Weird Glitchy", "category": "Style", "group": "Weird"},
+            {"tag": "Haunted", "prompt": "Song Style of Weird Haunted", "category": "Style", "group": "Weird"},
+            {"tag": "Hollow", "prompt": "Song Style of Weird Hollow", "category": "Style", "group": "Weird"},
+            {"tag": "Musicbox", "prompt": "Song Style of Weird Musicbox", "category": "Style", "group": "Weird"},
+            {"tag": "Random", "prompt": "Song Style of Weird Random", "category": "Style", "group": "Weird"},
+
+            {"tag": "Arabian", "prompt": "Song Style of World/Ethnic Arabian", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Bangra", "prompt": "Song Style of World/Ethnic Bangra", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Calypso", "prompt": "Song Style of World/Ethnic Calypso", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Chalga", "prompt": "Song Style of World/Ethnic Chalga", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Egyptian", "prompt": "Song Style of World/Ethnic Egyptian", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Hindustani", "prompt": "Song Style of World/Ethnic Hindustani", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Hōgaku", "prompt": "Song Style of World/Ethnic Hōgaku", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Jewish Music", "prompt": "Song Style of World/Ethnic Jewish Music", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Klezmer", "prompt": "Song Style of World/Ethnic Klezmer", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Matsuri", "prompt": "Song Style of World/Ethnic Matsuri", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Middle East", "prompt": "Song Style of World/Ethnic Middle East", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Polka", "prompt": "Song Style of World/Ethnic Polka", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Russian Navy Song", "prompt": "Song Style of World/Ethnic Russian Navy Song", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Suomipop", "prompt": "Song Style of World/Ethnic Suomipop", "category": "Style", "group": "World/Ethnic"},
+            {"tag": "Tribal", "prompt": "Song Style of World/Ethnic Tribal", "category": "Style", "group": "World/Ethnic"},
+
+            {"tag": "Appalachian", "prompt": "Song Genre of Country Appalachian", "category": "Genre", "group": "Country"},
+            {"tag": "Bluegrass", "prompt": "Song Genre of Country Bluegrass", "category": "Genre", "group": "Country"},
+            {"tag": "Country", "prompt": "Song Genre of Country Country", "category": "Genre", "group": "Country"},
+            {"tag": "Folk", "prompt": "Song Genre of Country Folk", "category": "Genre", "group": "Country"},
+            {"tag": "Freak Folk", "prompt": "Song Genre of Country Freak Folk", "category": "Genre", "group": "Country"},
+            {"tag": "Western", "prompt": "Song Genre of Country Western", "category": "Genre", "group": "Country"},
+
+            {"tag": "Afro-Cuban", "prompt": "Song Genre of Dance Afro-Cuban", "category": "Genre", "group": "Dance"},
+            {"tag": "Dance Pop", "prompt": "Song Genre of Dance Dance Pop", "category": "Genre", "group": "Dance"},
+            {"tag": "Disco", "prompt": "Song Genre of Dance Disco", "category": "Genre", "group": "Dance"},
+            {"tag": "Dubstep", "prompt": "Song Genre of Dance Dubstep", "category": "Genre", "group": "Dance"},
+            {"tag": "Disco Funk", "prompt": "Song Genre of Dance Disco Funk", "category": "Genre", "group": "Dance"},
+            {"tag": "EDM", "prompt": "Song Genre of Dance EDM", "category": "Genre", "group": "Dance"},
+            {"tag": "Electro", "prompt": "Song Genre of Dance Electro", "category": "Genre", "group": "Dance"},
+            {"tag": "High-NRG", "prompt": "Song Genre of Dance High-NRG", "category": "Genre", "group": "Dance"},
+            {"tag": "House", "prompt": "Song Genre of Dance House", "category": "Genre", "group": "Dance"},
+            {"tag": "Trance", "prompt": "Song Genre of Dance Trance", "category": "Genre", "group": "Dance"},
+
+            {"tag": "Ambient", "prompt": "Song Genre of Downtempo Ambient", "category": "Genre", "group": "Downtempo"},
+            {"tag": "Downtempo", "prompt": "Song Genre of Downtempo Downtempo", "category": "Genre", "group": "Downtempo"},
+            {"tag": "Synthwave", "prompt": "Song Genre of Downtempo Synthwave", "category": "Genre", "group": "Downtempo"},
+            {"tag": "Trap", "prompt": "Song Genre of Downtempo Trap", "category": "Genre", "group": "Downtempo"},
+
+            {"tag": "Cyberpunk", "prompt": "Song Genre of Electronic Cyberpunk", "category": "Genre", "group": "Electronic"},
+            {"tag": "Drum'n'bass", "prompt": "Song Genre of Electronic Drum'n'bass", "category": "Genre", "group": "Electronic"},
+            {"tag": "Dubstep", "prompt": "Song Genre of Electronic Dubstep", "category": "Genre", "group": "Electronic"},
+            {"tag": "Electronic", "prompt": "Song Genre of Electronic Electronic", "category": "Genre", "group": "Electronic"},
+            {"tag": "Hypnogogical", "prompt": "Song Genre of Electronic Hypnogogical", "category": "Genre", "group": "Electronic"},
+            {"tag": "Phonk", "prompt": "Song Genre of Electronic Phonk", "category": "Genre", "group": "Electronic"},
+            {"tag": "Synthpop", "prompt": "Song Genre of Electronic Synthpop", "category": "Genre", "group": "Electronic"},
+            {"tag": "Techno", "prompt": "Song Genre of Electronic Techno", "category": "Genre", "group": "Electronic"},
+            {"tag": "Trap", "prompt": "Song Genre of Electronic Trap", "category": "Genre", "group": "Electronic"},
+
+            {"tag": "Bebop", "prompt": "Song Genre of Jazz/Soul Bebop", "category": "Genre", "group": "Jazz/Soul"},
+            {"tag": "Gospel", "prompt": "Song Genre of Jazz/Soul Gospel", "category": "Genre", "group": "Jazz/Soul"},
+            {"tag": "Electro", "prompt": "Song Genre of Jazz/Soul Electro", "category": "Genre", "group": "Jazz/Soul"},
+            {"tag": "Frutiger Aero", "prompt": "Song Genre of Jazz/Soul Frutiger Aero", "category": "Genre", "group": "Jazz/Soul"},
+            {"tag": "Jazz", "prompt": "Song Genre of Jazz/Soul Jazz", "category": "Genre", "group": "Jazz/Soul"},
+            {"tag": "Latin Jazz", "prompt": "Song Genre of Jazz/Soul Latin Jazz", "category": "Genre", "group": "Jazz/Soul"},
+            {"tag": "RnB", "prompt": "Song Genre of Jazz/Soul RnB", "category": "Genre", "group": "Jazz/Soul"},
+            {"tag": "Soul", "prompt": "Song Genre of Jazz/Soul Soul", "category": "Genre", "group": "Jazz/Soul"},
+
+            {"tag": "Bossa Nova", "prompt": "Song Genre of Latin Bossa Nova", "category": "Genre", "group": "Latin"},
+            {"tag": "Latin Jazz", "prompt": "Song Genre of Latin Latin Jazz", "category": "Genre", "group": "Latin"},
+            {"tag": "Forró", "prompt": "Song Genre of Latin Forró", "category": "Genre", "group": "Latin"},
+            {"tag": "Mambo", "prompt": "Song Genre of Latin Mambo", "category": "Genre", "group": "Latin"},
+            {"tag": "Salsa", "prompt": "Song Genre of Latin Salsa", "category": "Genre", "group": "Latin"},
+            {"tag": "Tango", "prompt": "Song Genre of Latin Tango", "category": "Genre", "group": "Latin"},
+
+            {"tag": "Afrobeat", "prompt": "Song Genre of Reggae Afrobeat", "category": "Genre", "group": "Reggae"},
+            {"tag": "Dancehall", "prompt": "Song Genre of Reggae Dancehall", "category": "Genre", "group": "Reggae"},
+            {"tag": "Dub", "prompt": "Song Genre of Reggae Dub", "category": "Genre", "group": "Reggae"},
+            {"tag": "Reggae", "prompt": "Song Genre of Reggae Reggae", "category": "Genre", "group": "Reggae"},
+            {"tag": "Reggaeton", "prompt": "Song Genre of Reggae Reggaeton", "category": "Genre", "group": "Reggae"},
+
+            {"tag": "Black Metal", "prompt": "Song Genre of Metal Black Metal", "category": "Genre", "group": "Metal"},
+            {"tag": "Deathcore", "prompt": "Song Genre of Metal Deathcore", "category": "Genre", "group": "Metal"},
+            {"tag": "Death Metal", "prompt": "Song Genre of Metal Death Metal", "category": "Genre", "group": "Metal"},
+            {"tag": "Heavy Metal", "prompt": "Song Genre of Metal Heavy Metal", "category": "Genre", "group": "Metal"},
+            {"tag": "Heavy Metal Trap", "prompt": "Song Genre of Metal Heavy Metal Trap", "category": "Genre", "group": "Metal"},
+            {"tag": "Metalcore", "prompt": "Song Genre of Metal Metalcore", "category": "Genre", "group": "Metal"},
+            {"tag": "Nu Metal", "prompt": "Song Genre of Metal Nu Metal", "category": "Genre", "group": "Metal"},
+            {"tag": "Power Metal", "prompt": "Song Genre of Metal Power Metal", "category": "Genre", "group": "Metal"},
+
+            {"tag": "Pop", "prompt": "Song Genre of Popular Pop", "category": "Genre", "group": "Popular"},
+            {"tag": "Dance Pop", "prompt": "Song Genre of Popular Dance Pop", "category": "Genre", "group": "Popular"},
+            {"tag": "Pop Rock", "prompt": "Song Genre of Popular Pop Rock", "category": "Genre", "group": "Popular"},
+            {"tag": "Kpop", "prompt": "Song Genre of Popular Kpop", "category": "Genre", "group": "Popular"},
+            {"tag": "Jpop", "prompt": "Song Genre of Popular Jpop", "category": "Genre", "group": "Popular"},
+            {"tag": "RnB", "prompt": "Song Genre of Popular RnB", "category": "Genre", "group": "Popular"},
+            {"tag": "Synthpop", "prompt": "Song Genre of Popular Synthpop", "category": "Genre", "group": "Popular"},
+
+            {"tag": "Classic Rock", "prompt": "Song Genre of Rock Classic Rock", "category": "Genre", "group": "Rock"},
+            {"tag": "Blues Rock", "prompt": "Song Genre of Rock Blues Rock", "category": "Genre", "group": "Rock"},
+            {"tag": "Emo", "prompt": "Song Genre of Rock Emo", "category": "Genre", "group": "Rock"},
+            {"tag": "Glam Rock", "prompt": "Song Genre of Rock Glam Rock", "category": "Genre", "group": "Rock"},
+            {"tag": "Hardcore Punk", "prompt": "Song Genre of Rock Hardcore Punk", "category": "Genre", "group": "Rock"},
+            {"tag": "Indie", "prompt": "Song Genre of Rock Indie", "category": "Genre", "group": "Rock"},
+            {"tag": "Industrial Rock", "prompt": "Song Genre of Rock Industrial Rock", "category": "Genre", "group": "Rock"},
+            {"tag": "Punk", "prompt": "Song Genre of Rock Punk", "category": "Genre", "group": "Rock"},
+            {"tag": "Rock", "prompt": "Song Genre of Rock Rock", "category": "Genre", "group": "Rock"},
+            {"tag": "Skate Rock", "prompt": "Song Genre of Rock Skate Rock", "category": "Genre", "group": "Rock"},
+            {"tag": "Skatecore", "prompt": "Song Genre of Rock Skatecore", "category": "Genre", "group": "Rock"},
+            {"tag": "Suomipop", "prompt": "Song Genre of Rock Suomipop", "category": "Genre", "group": "Rock"},
+
+            {"tag": "Funk", "prompt": "Song Genre of Urban Funk", "category": "Genre", "group": "Urban"},
+            {"tag": "Electro", "prompt": "Song Genre of Urban Electro", "category": "Genre", "group": "Urban"},
+            {"tag": "HipHop", "prompt": "Song Genre of Urban HipHop", "category": "Genre", "group": "Urban"},
+            {"tag": "RnB", "prompt": "Song Genre of Urban RnB", "category": "Genre", "group": "Urban"},
+            {"tag": "Phonk", "prompt": "Song Genre of Urban Phonk", "category": "Genre", "group": "Urban"},
+            {"tag": "Rap", "prompt": "Song Genre of Urban Rap", "category": "Genre", "group": "Urban"},
+            {"tag": "Trap", "prompt": "Song Genre of Urban Trap", "category": "Genre", "group": "Urban"},
+
+            {"tag": "Elevator", "prompt": "Song Type of Background Elevator", "category": "Type", "group": "Background"},
+            {"tag": "Jingle", "prompt": "Song Type of Background Jingle", "category": "Type", "group": "Background"},
+            {"tag": "Muzak", "prompt": "Song Type of Background Muzak", "category": "Type", "group": "Background"},
+
+            {"tag": "Adan", "prompt": "Song Type of Call to Prayer Adan", "category": "Type", "group": "Call to Prayer"},
+            {"tag": "Adjan", "prompt": "Song Type of Call to Prayer Adjan", "category": "Type", "group": "Call to Prayer"},
+            {"tag": "Call to Prayer", "prompt": "Song Type of Call to Prayer Call to Prayer", "category": "Type", "group": "Call to Prayer"},
+            {"tag": "Gregorian Chant", "prompt": "Song Type of Call to Prayer Gregorian Chant", "category": "Type", "group": "Call to Prayer"},
+
+            {"tag": "I Want Song", "prompt": "Song Type of Character I Want Song", "category": "Type", "group": "Character"},
+            {"tag": "Hero Theme", "prompt": "Song Type of Character Hero Theme", "category": "Type", "group": "Character"},
+            {"tag": "Strut", "prompt": "Song Type of Character Strut", "category": "Type", "group": "Character"},
+            {"tag": "March", "prompt": "Song Type of Character March", "category": "Type", "group": "Character"},
+            {"tag": "Military", "prompt": "Song Type of Character Military", "category": "Type", "group": "Character"},
+            {"tag": "Villain Theme", "prompt": "Song Type of Character Villain Theme", "category": "Type", "group": "Character"},
+
+            {"tag": "Lullaby", "prompt": "Song Type of Children Lullaby", "category": "Type", "group": "Children"},
+            {"tag": "Nursery Rhyme", "prompt": "Song Type of Children Nursery Rhyme", "category": "Type", "group": "Children"},
+            {"tag": "Sing-along", "prompt": "Song Type of Children Sing-along", "category": "Type", "group": "Children"},
+            {"tag": "Toddler", "prompt": "Song Type of Children Toddler", "category": "Type", "group": "Children"},
+
+            {"tag": "Adagio", "prompt": "Song Type of Composer Adagio", "category": "Type", "group": "Composer"},
+            {"tag": "Adjunct", "prompt": "Song Type of Composer Adjunct", "category": "Type", "group": "Composer"},
+            {"tag": "Andante", "prompt": "Song Type of Composer Andante", "category": "Type", "group": "Composer"},
+            {"tag": "Allegro", "prompt": "Song Type of Composer Allegro", "category": "Type", "group": "Composer"},
+            {"tag": "Capriccio", "prompt": "Song Type of Composer Capriccio", "category": "Type", "group": "Composer"},
+
+            {"tag": "Acoustic Guitar", "prompt": "Song Type of Instruments Acoustic Guitar", "category": "Type", "group": "Instruments"},
+            {"tag": "Bass", "prompt": "Song Type of Instruments Bass", "category": "Type", "group": "Instruments"},
+            {"tag": "Doublebass", "prompt": "Song Type of Instruments Doublebass", "category": "Type", "group": "Instruments"},
+            {"tag": "Electricbass", "prompt": "Song Type of Instruments Electricbass", "category": "Type", "group": "Instruments"},
+            {"tag": "Electric Guitar", "prompt": "Song Type of Instruments Electric Guitar", "category": "Type", "group": "Instruments"},
+            {"tag": "Fingerstyle Guitar", "prompt": "Song Type of Instruments Fingerstyle Guitar", "category": "Type", "group": "Instruments"},
+            {"tag": "Percussion", "prompt": "Song Type of Instruments Percussion", "category": "Type", "group": "Instruments"},
+
+            {"tag": "Chaotic", "prompt": "Song Type of Noise Chaotic", "category": "Type", "group": "Noise"},
+            {"tag": "Distorted", "prompt": "Song Type of Noise Distorted", "category": "Type", "group": "Noise"},
+            {"tag": "Glitch", "prompt": "Song Type of Noise Glitch", "category": "Type", "group": "Noise"},
+            {"tag": "Noise", "prompt": "Song Type of Noise Noise", "category": "Type", "group": "Noise"},
+            {"tag": "Random", "prompt": "Song Type of Noise Random", "category": "Type", "group": "Noise"},
+            {"tag": "Stuttering", "prompt": "Song Type of Noise Stuttering", "category": "Type", "group": "Noise"},
+
+            {"tag": "glissando trombone", "prompt": "Song Type of Orchestral glissando trombone", "category": "Type", "group": "Orchestral"},
+            {"tag": "legato cello", "prompt": "Song Type of Orchestral legato cello", "category": "Type", "group": "Orchestral"},
+            {"tag": "Orchestral", "prompt": "Song Type of Orchestral Orchestral", "category": "Type", "group": "Orchestral"},
+            {"tag": "spiccato violins", "prompt": "Song Type of Orchestral spiccato violins", "category": "Type", "group": "Orchestral"},
+            {"tag": "staccato viola", "prompt": "Song Type of Orchestral staccato viola", "category": "Type", "group": "Orchestral"},
+            {"tag": "Symphonic", "prompt": "Song Type of Orchestral Symphonic", "category": "Type", "group": "Orchestral"},
+
+            {"tag": "1960s", "prompt": "Song Type of Retro 1960s", "category": "Type", "group": "Retro"},
+            {"tag": "Barbershop", "prompt": "Song Type of Retro Barbershop", "category": "Type", "group": "Retro"},
+            {"tag": "Big Band", "prompt": "Song Type of Retro Big Band", "category": "Type", "group": "Retro"},
+            {"tag": "Classic", "prompt": "Song Type of Retro Classic", "category": "Type", "group": "Retro"},
+            {"tag": "Doo Wop", "prompt": "Song Type of Retro Doo Wop", "category": "Type", "group": "Retro"},
+            {"tag": "Girl Group", "prompt": "Song Type of Retro Girl Group", "category": "Type", "group": "Retro"},
+            {"tag": "Mambo", "prompt": "Song Type of Retro Mambo", "category": "Type", "group": "Retro"},
+            {"tag": "Salooncore", "prompt": "Song Type of Retro Salooncore", "category": "Type", "group": "Retro"},
+            {"tag": "Swing", "prompt": "Song Type of Retro Swing", "category": "Type", "group": "Retro"},
+            {"tag": "Traditional", "prompt": "Song Type of Retro Traditional", "category": "Type", "group": "Retro"},
+
+            {"tag": "…core", "prompt": "Song Type with Suffix …core", "category": "Type", "group": "Suffix"},
+            {"tag": "…jam", "prompt": "Song Type with Suffix …jam", "category": "Type", "group": "Suffix"},
+            {"tag": "…out", "prompt": "Song Type with Suffix …out", "category": "Type", "group": "Suffix"},
+            {"tag": "…wave", "prompt": "Song Type with Suffix …wave", "category": "Type", "group": "Suffix"},
+
+            {"tag": "Americana", "prompt": "Song Type of Traditional Americana", "category": "Type", "group": "Traditional"},
+            {"tag": "Barbershop", "prompt": "Song Type of Traditional Barbershop", "category": "Type", "group": "Traditional"},
+            {"tag": "Christmas Carol", "prompt": "Song Type of Traditional Christmas Carol", "category": "Type", "group": "Traditional"},
+            {"tag": "Traditional", "prompt": "Song Type of Traditional Traditional", "category": "Type", "group": "Traditional"},
+
+            {"tag": "A Cappella", "prompt": "Song Type of Voice A Cappella", "category": "Type", "group": "Voice"},
+            {"tag": "Arabian Ornamental", "prompt": "Song Type of Voice Arabian Ornamental", "category": "Type", "group": "Voice"},
+            {"tag": "Dispassionate", "prompt": "Song Type of Voice Dispassionate", "category": "Type", "group": "Voice"},
+            {"tag": "Emotional", "prompt": "Song Type of Voice Emotional", "category": "Type", "group": "Voice"},
+            {"tag": "Ethereal", "prompt": "Song Type of Voice Ethereal", "category": "Type", "group": "Voice"},
+            {"tag": "Gregorian chant", "prompt": "Song Type of Voice Gregorian chant", "category": "Type", "group": "Voice"},
+            {"tag": "Hindustani", "prompt": "Song Type of Voice Hindustani", "category": "Type", "group": "Voice"},
+            {"tag": "Lounge Singer", "prompt": "Song Type of Voice Lounge Singer", "category": "Type", "group": "Voice"},
+            {"tag": "Melismatic", "prompt": "Song Type of Voice Melismatic", "category": "Type", "group": "Voice"},
+            {"tag": "Monotone", "prompt": "Song Type of Voice Monotone", "category": "Type", "group": "Voice"},
+            {"tag": "Narration", "prompt": "Song Type of Voice Narration", "category": "Type", "group": "Voice"},
+            {"tag": "Resonant", "prompt": "Song Type of Voice Resonant", "category": "Type", "group": "Voice"},
+            {"tag": "Spoken Word", "prompt": "Song Type of Voice Spoken Word", "category": "Type", "group": "Voice"},
+            {"tag": "Sprechgesang", "prompt": "Song Type of Voice Sprechgesang", "category": "Type", "group": "Voice"},
+            {"tag": "Sultry", "prompt": "Song Type of Voice Sultry", "category": "Type", "group": "Voice"},
+            {"tag": "Scream", "prompt": "Song Type of Voice Scream", "category": "Type", "group": "Voice"},
+            {"tag": "Torchy", "prompt": "Song Type of Voice Torchy", "category": "Type", "group": "Voice"},
+            {"tag": "Vocaloid", "prompt": "Song Type of Voice Vocaloid", "category": "Type", "group": "Voice"}
+        ]
+
+        let DATA_KEYS;
+        let DATA_PAIRS;
+
+        async function getEmbedding(text) {
+            return await (await getModel()).embed(text);
+        }
+
+        let STACKED_EMBEDDINGS;
+        let DESCRIPTOR_MAGNITUDES
+        async function getStackedEmbeddings() {
+            if (!STACKED_EMBEDDINGS) {
+                STACKED_EMBEDDINGS = tf.stack(await getDataKeys());
+            }
+            return STACKED_EMBEDDINGS;
+        }
+        async function getDescriptorMagnitudes() {
+            if (!DESCRIPTOR_MAGNITUDES) {
+                DESCRIPTOR_MAGNITUDES = tf.norm(await getStackedEmbeddings(), 'euclidean', -1);
+            }
+            return DESCRIPTOR_MAGNITUDES;
+        }
+
+        async function cosineSimilarityTensor(embedding) {
+            // Stack all descriptor tensors into a single tensor
+            const stackedDescriptors = await getStackedEmbeddings();
+
+            // Keep track of tensors to dispose
+            const tensorsToDispose = [];
+
+            try {
+                // Compute dot product between query tensor and each descriptor
+                const dotProducts = tf.matMul(embedding, stackedDescriptors, false, true); // Shape: [1, num_descriptors]
+                tensorsToDispose.push(dotProducts);
+
+                // Compute magnitudes of query tensor and descriptors
+                const queryMagnitude = tf.norm(embedding, 'euclidean'); // Shape: [1]
+                tensorsToDispose.push(queryMagnitude);
+
+                const descriptorMagnitudes = await getDescriptorMagnitudes(); // Shape: [num_descriptors]
+
+                // Compute cosine similarity
+                const cosineSimilarities = dotProducts.div(queryMagnitude).div(descriptorMagnitudes); // Shape: [1, num_descriptors]
+                tensorsToDispose.push(cosineSimilarities);
+
+                const result = cosineSimilarities.squeeze(); // Shape: [num_descriptors]
+
+                // Note: Do not dispose of 'result' here since it's returned
+
+                return result;
+            } finally {
+                // Dispose of intermediate tensors
+                tensorsToDispose.forEach(tensor => tensor.dispose());
+            }
+        }
+
+        async function negativeNormDistanceTensor(embedding) {
+            // Stack all descriptor tensors into a single tensor
+            const stackedDescriptors = await getStackedEmbeddings();
+
+            // Keep track of tensors to dispose
+            const tensorsToDispose = [];
+
+            try {
+                // Compute the distance between the query tensor and each descriptor.
+                const diffs = stackedDescriptors.sub(embedding);
+                tensorsToDispose.push(diffs);
+                const norm = tf.norm(diffs, 'euclidean', -1) // Shape: [num_descriptors]
+                const distances = norm.mul(-1); // Shape: [num_descriptors]
+                tensorsToDispose.push(distances);
+
+                return distances.squeeze();
+            } finally {
+                // Dispose of intermediate tensors
+                tensorsToDispose.forEach(tensor => tensor.dispose());
+            }
+        }
+
+        async function queryDescriptors(embedding, topN = 5) {
+            const scores = await negativeNormDistanceTensor(embedding);
+            // Keep track of tensors to dispose
+            const tensorsToDispose = [scores];
+
+            try {
+                // Get indices of top N matches
+                const { values, indices } = tf.topk(scores, topN);
+                tensorsToDispose.push(values);
+                tensorsToDispose.push(indices);
+                const topIndices = indices.dataSync();
+
+                // Map top indices to DATA entries
+                const results = [];
+                for (let i = 0; i < topN; ++i) {
+                    results.push(DATA[topIndices[i]]);
+                }
+
+                return results;
+            } finally {
+                // Dispose of intermediate tensors
+                tensorsToDispose.forEach(tensor => tensor.dispose());
+            }
+        }
+
+        // The actual concept would be to take the top N results and combine them.
+        // If they have the same category, then we can combine them.
+        // If they have different categories, then we can display them separately.
+        // If they are in the same group, then we combine them within the category.
+
+        async function buildCustomDescriptor(text, topN) {
+            const embedding = await getEmbedding(text);
+            const descriptors = await queryDescriptors(embedding, topN);
+
+            console.log(descriptors)
+
+            // For each category, we will then collect it into each group.
+            const categories = {};
+            descriptors.forEach(descriptor => {
+                let category = categories[descriptor.category];
+                if (!category) {
+                    category = {
+                        count: 0,
+                        groups: {}
+                    };
+                    categories[descriptor.category] = category;
+                }
+                let group = category.groups[descriptor.group];
+                if (!group) {
+                    group = [];
+                    category.groups[descriptor.group] = group;
+                }
+                group.push(descriptor);
+                category.count++;
+            });
+
+            const descriptorStrings = [];
+            
+            // Take each group, and concat it as a string with spaces with the tags of that object.
+            // If the group equals the tag, do not add that tag.
+            for (const category in categories) {
+                const categoryData = categories[category];
+                for (const group in categoryData.groups) {
+                    const groupData = categoryData.groups[group];
+                    const concatList = [group]
+                    for (const descriptor of groupData) {
+                        if (descriptor.tag !== group) {
+                            concatList.push(descriptor.tag);
+                        }
+                    }
+                    descriptorStrings.push(concatList.join(' '));
+                }
+            }
+
+            return descriptorStrings;
+        }
+
+        async function getDataKeys() {
+            if (!DATA_KEYS) {
+                // Compute the keys for all the data.
+                DATA_KEYS = await Promise.all(DATA.map(async (data) => {
+                    return await getEmbedding(data.prompt);
+                }));
+            }
+            return DATA_KEYS
+        }
+        async function getDataPairs() {
+            if (!DATA_PAIRS) {
+                let dks = await getDataKeys();
+                DATA_PAIRS = await Promise.all(DATA.map((value, i) => ({key: dks[i], value})));
+            }
+            return DATA_PAIRS
+        }
+
+        window.onload = async () => {
+            await getModel();
+            await displayData();
+        }
+
+        const outputElement = document.getElementById('output');
+        const output1Element = document.getElementById('output-1');
+        const output2Element = document.getElementById('output-2');
+        const searchElement = document.getElementById('search');
+        const sortingElement = document.getElementById('sorting');
+
+        async function displayData() {
+            const sorting = sortingElement.value;
+
+            if (sorting === 'All') {
+                outputElement.innerHTML = (await getDataPairs()).map(({key, value}) => {
+                    return value.prompt;
+                }).join('\n');
+                output1Element.innerHTML = '';
+                output2Element.innerHTML = '';
+            } else if (sorting === 'Category') {
+                // Each output will get one of the three categories.
+                const categories = [
+                    'Style',
+                    'Genre',
+                    'Type'
+                ];
+                const data = await getDataPairs();
+                const dataByCategory = categories.map(category => {
+                    return data.filter(({value}) => value.category === category);
+                });
+                
+                outputElement.innerHTML = (dataByCategory[0]).map(({key, value}) => {
+                    return value.prompt;
+                }).join('\n');
+                output1Element.innerHTML = (dataByCategory[1]).map(({key, value}) => {
+                    return value.prompt;
+                }).join('\n');
+                output2Element.innerHTML = (dataByCategory[2]).map(({key, value}) => {
+                    return value.prompt;
+                }).join('\n');
+            }
+        }
+
+        async function score(a, b) {
+            // The score is computed by the distance from the embeddings.
+            return tf.norm(a.sub(b)).dataSync()[0];
+        }
+
+        async function resort(text) {
+            if (sorting.value === 'Descriptor') {
+                const descriptors = await buildCustomDescriptor(text, 10);
+                outputElement.innerHTML = descriptors.join('\n');
+                output1Element.innerHTML = '';
+                output2Element.innerHTML = '';
+                return;
+            }
+
+            const key = await getEmbedding(text);
+            const pairs = await getDataPairs();
+
+            // Compute the score for each data pair.
+            const scores = await Promise.all(pairs.map(({key: k}) => score(k, key)));
+
+            // Sort the data by the score.
+            DATA_PAIRS = pairs.map((pair, i) => ({...pair, score: scores[i]})).sort((a, b) => a.score - b.score);
+            await displayData();
+        }
+
+        searchElement.addEventListener('input', async () => {
+            const text = searchElement.value;
+            if (text && text.length > 0) {
+                await resort(text);
+            }
+        });
+
+        sortingElement.addEventListener('change', async () => {
+            const text = searchElement.value;
+            if (text && text.length > 0) {
+                await resort(text);
+            }
+        });
+        
+        </script>
+</body>
+</html>
