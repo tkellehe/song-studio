@@ -385,42 +385,58 @@
             }
         }
 
-        async function queryDescriptors(embedding, topN = 5) {
-            const scores = await negativeNormDistanceTensor(embedding);
+        async function dotProductTensor(embedding) {
+            // Stack all descriptor tensors into a single tensor
+            const stackedDescriptors = await getStackedEmbeddings();
+
             // Keep track of tensors to dispose
-            const tensorsToDispose = [scores];
+            const tensorsToDispose = [];
 
             try {
-                // Get indices of top N matches
-                const { values, indices } = tf.topk(scores, topN);
-                tensorsToDispose.push(values);
-                tensorsToDispose.push(indices);
-                const topIndices = indices.dataSync();
+                // Compute dot product between query tensor and each descriptor
+                const dotProducts = tf.matMul(embedding, stackedDescriptors, false, true); // Shape: [1, num_descriptors]
+                tensorsToDispose.push(dotProducts);
 
-                // Map top indices to DATA entries
-                const results = [];
-                for (let i = 0; i < topN; ++i) {
-                    results.push(DATA[topIndices[i]]);
-                }
-
-                return results;
+                return dotProducts.squeeze();
             } finally {
                 // Dispose of intermediate tensors
                 tensorsToDispose.forEach(tensor => tensor.dispose());
             }
         }
 
-        // The actual concept would be to take the top N results and combine them.
-        // If they have the same category, then we can combine them.
-        // If they have different categories, then we can display them separately.
-        // If they are in the same group, then we combine them within the category.
+        async function queryDescriptors(embedding, topN = 5, bottomN = 5) {
+            const scores = await dotProductTensor(embedding);
+            // Keep track of tensors to dispose
+            const tensorsToDispose = [scores];
 
-        async function buildCustomDescriptor(text, topN) {
-            const embedding = await getEmbedding(text);
-            const descriptors = await queryDescriptors(embedding, topN);
+            try {
+                const { indices: topIndices, values: topValues } = tf.topk(scores, topN);
+                const invertedScores = scores.mul(-1);
+                const { indices: bottomIndices, values: bottomValues } = tf.topk(invertedScores, bottomN);
+                tensorsToDispose.push(topIndices, topValues, bottomIndices, bottomValues, invertedScores);
+                const topIndicesArray = topIndices.dataSync();
+                const bottomIndicesArray = bottomIndices.dataSync();
 
-            console.log(descriptors)
+                // Map top indices to DATA entries
+                const tops = [];
+                for (let i = 0; i < topN; ++i) {
+                    tops.push(DATA[topIndicesArray[i]]);
+                }
 
+                // Map bottom indices to DATA entries
+                const bottoms = [];
+                for (let i = 0; i < bottomN; ++i) {
+                    bottoms.push(DATA[bottomIndicesArray[i]]);
+                }
+
+                return {tops, bottoms};
+            } finally {
+                // Dispose of intermediate tensors
+                tensorsToDispose.forEach(tensor => tensor.dispose());
+            }
+        }
+
+        function buildDescriptorStrings(descriptors) {
             // For each category, we will then collect it into each group.
             const categories = {};
             descriptors.forEach(descriptor => {
@@ -442,7 +458,7 @@
             });
 
             const descriptorStrings = [];
-            
+
             // Take each group, and concat it as a string with spaces with the tags of that object.
             // If the group equals the tag, do not add that tag.
             for (const category in categories) {
@@ -460,6 +476,16 @@
             }
 
             return descriptorStrings;
+        }
+
+        async function buildCustomDescriptor(text, topN, bottomN) {
+            const embedding = await getEmbedding(text);
+            const descriptors = await queryDescriptors(embedding, topN, bottomN);
+
+            return {
+                include: buildDescriptorStrings(descriptors.tops),
+                exclude: buildDescriptorStrings(descriptors.bottoms)
+            }
         }
 
         async function getDataKeys() {
@@ -530,9 +556,9 @@
 
         async function resort(text) {
             if (sorting.value === 'Descriptor') {
-                const descriptors = await buildCustomDescriptor(text, 10);
-                outputElement.innerHTML = descriptors.join('\n');
-                output1Element.innerHTML = '';
+                const descriptors = await buildCustomDescriptor(text, 10, 5);
+                outputElement.innerHTML = descriptors.include.join('\n');
+                output1Element.innerHTML = descriptors.exclude.join('\n');
                 output2Element.innerHTML = '';
                 return;
             }
