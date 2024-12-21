@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Song Studio - Suno</title>
+  <style>
+    /* General reset */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Header styles */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    header img {
+      width: 50px;
+      height: 50px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+    }
+
+    /* Input and output areas */
+    .container {
+      width: 90%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid;
+      border-image-slice: 1;
+      border-width: 4px;
+      border-image-source: linear-gradient(45deg, #06b6d4, #ec4899);
+      border-radius: 5px;
+      background-color: #1e1e1e;
+      color: #ffffff;
+      resize: none;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    textarea:focus {
+      outline: none;
+      box-shadow: 0 0 10px #06b6d4;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 2px solid #06b6d4;
+      border-radius: 5px;
+      background-color: #1e1e1e;
+      color: #ffffff;
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 10px #06b6d4;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="./assets/note-icon.svg" alt="Note Icon">
+    <h1>Song Studio - Suno</h1>
+  </header>
+  <div class="container">
+    <input type="text" id="prompt-input" placeholder="Enter your prompt here">
+    <textarea id="include-tags" placeholder="Include Tags" rows="5" readonly></textarea>
+    <textarea id="exclude-tags" placeholder="Exclude Tags" rows="5" readonly></textarea>
+  </div>
+</body>
+</html>
