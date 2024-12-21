@@ -4,20 +4,27 @@
   width="100"
   height="100"
 >
-  <!-- Define the linear gradient -->
+  <!-- Define the linear gradients -->
   <defs>
-    <linearGradient id="electric-gradient" gradientTransform="rotate(45)">
+    <!-- Gradient for the circle -->
+    <linearGradient id="circle-gradient" gradientTransform="rotate(45)">
       <stop offset="0%" stop-color="#06b6d4" />
       <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+
+    <!-- Gradient for the square -->
+    <linearGradient id="square-gradient" gradientTransform="rotate(45)">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#06b6d4" />
     </linearGradient>
   </defs>
 
   <!-- Circle representing the note's head -->
-  <circle cx="30" cy="70" r="10" fill="url(#electric-gradient)" />
+  <circle cx="30" cy="70" r="10" fill="url(#circle-gradient)" />
 
   <!-- Line representing the stem -->
-  <rect x="35" y="30" width="5" height="40" fill="url(#electric-gradient)" />
+  <rect x="35" y="30" width="5" height="40" fill="#ec4899" />
 
   <!-- Square representing the flag -->
-  <rect x="40" y="30" width="20" height="20" fill="url(#electric-gradient)" />
+  <rect x="40" y="30" width="20" height="20" fill="url(#square-gradient)" />
 </svg>
