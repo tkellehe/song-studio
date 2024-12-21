@@ -1,0 +1,1238 @@
+{
+    "descriptors": [
+            {
+                "tag": "Dance",
+                "category": "Style",
+                "group": "Danceable"
+            },
+            {
+                "tag": "Festive",
+                "category": "Style",
+                "group": "Danceable"
+            },
+            {
+                "tag": "Groovy",
+                "category": "Style",
+                "group": "Danceable"
+            },
+            {
+                "tag": "Mid-Tempo",
+                "category": "Style",
+                "group": "Danceable"
+            },
+            {
+                "tag": "Syncopated",
+                "category": "Style",
+                "group": "Danceable"
+            },
+            {
+                "tag": "Tipsy",
+                "category": "Style",
+                "group": "Danceable"
+
+            },
+            {
+                "tag": "Atmospheric",
+                "category": "Style",
+                "group": "Dark"
+            },
+            {
+                "tag": "Cold",
+                "category": "Style",
+                "group": "Dark"
+            },
+            {
+                "tag": "Dark",
+                "category": "Style",
+                "group": "Dark"
+            },
+            {
+                "tag": "Doom",
+                "category": "Style",
+                "group": "Dark"
+            },
+            {
+                "tag": "Dramatic",
+                "category": "Style",
+                "group": "Dark"
+            },
+            {
+                "tag": "Sinister",
+                "category": "Style",
+                "group": "Dark"
+
+            },
+            {
+                "tag": "Adjunct",
+                "category": "Style",
+                "group": "Eclectic"
+            },
+            {
+                "tag": "Art",
+                "category": "Style",
+                "group": "Eclectic"
+            },
+            {
+                "tag": "Capriccio",
+                "category": "Style",
+                "group": "Eclectic"
+            },
+            {
+                "tag": "Mellifluous",
+                "category": "Style",
+                "group": "Eclectic"
+            },
+            {
+                "tag": "Nü",
+                "category": "Style",
+                "group": "Eclectic"
+            },
+            {
+                "tag": "Progressive",
+                "category": "Style",
+                "group": "Eclectic"
+            },
+            {
+                "tag": "Unusual",
+                "category": "Style",
+                "group": "Eclectic"
+
+            },
+            {
+                "tag": "Anthemic",
+                "category": "Style",
+                "group": "Emotion"
+            },
+            {
+                "tag": "Emotional",
+                "category": "Style",
+                "group": "Emotion"
+            },
+            {
+                "tag": "Happy",
+                "category": "Style",
+                "group": "Emotion"
+            },
+            {
+                "tag": "Jubilant",
+                "category": "Style",
+                "group": "Emotion"
+            },
+            {
+                "tag": "Melancholy",
+                "category": "Style",
+                "group": "Emotion"
+            },
+            {
+                "tag": "Sad",
+                "category": "Style",
+                "group": "Emotion"
+
+            },
+            {
+                "tag": "Aggressive",
+                "category": "Style",
+                "group": "Hard"
+            },
+            {
+                "tag": "Banger",
+                "category": "Style",
+                "group": "Hard"
+            },
+            {
+                "tag": "Power",
+                "category": "Style",
+                "group": "Hard"
+            },
+            {
+                "tag": "Stadium",
+                "category": "Style",
+                "group": "Hard"
+            },
+            {
+                "tag": "Stomp",
+                "category": "Style",
+                "group": "Hard"
+
+            },
+            {
+                "tag": "Broadway",
+                "category": "Style",
+                "group": "Lyrical"
+            },
+            {
+                "tag": "Cabaret",
+                "category": "Style",
+                "group": "Lyrical"
+            },
+            {
+                "tag": "Lounge",
+                "category": "Style",
+                "group": "Lyrical"
+            },
+            {
+                "tag": "Operatic",
+                "category": "Style",
+                "group": "Lyrical"
+            },
+            {
+                "tag": "Storytelling",
+                "category": "Style",
+                "group": "Lyrical"
+            },
+            {
+                "tag": "Torch-Lounge",
+                "category": "Style",
+                "group": "Lyrical"
+            },
+            {
+                "tag": "Theatrical",
+                "category": "Style",
+                "group": "Lyrical"
+            },
+            {
+                "tag": "Troubadour",
+                "category": "Style",
+                "group": "Lyrical"
+            },
+            {
+                "tag": "Vegas",
+                "category": "Style",
+                "group": "Lyrical"
+
+            },
+            {
+                "tag": "Ethereal",
+                "category": "Style",
+                "group": "Magical"
+            },
+            {
+                "tag": "Majestic",
+                "category": "Style",
+                "group": "Magical"
+            },
+            {
+                "tag": "Mysterious",
+                "category": "Style",
+                "group": "Magical"
+
+            },
+            {
+                "tag": "Ambient",
+                "category": "Style",
+                "group": "Minimal"
+            },
+            {
+                "tag": "Cinematic",
+                "category": "Style",
+                "group": "Minimal"
+            },
+            {
+                "tag": "Heat",
+                "category": "Style",
+                "group": "Minimal"
+            },
+            {
+                "tag": "Minimal",
+                "category": "Style",
+                "group": "Minimal"
+            },
+            {
+                "tag": "Slow",
+                "category": "Style",
+                "group": "Minimal"
+            },
+            {
+                "tag": "Sparse",
+                "category": "Style",
+                "group": "Minimal"
+
+            },
+            {
+                "tag": "German Schlager",
+                "category": "Style",
+                "group": "Party"
+            },
+            {
+                "tag": "Glam",
+                "category": "Style",
+                "group": "Party"
+            },
+            {
+                "tag": "Glitter",
+                "category": "Style",
+                "group": "Party"
+            },
+            {
+                "tag": "Groovy",
+                "category": "Style",
+                "group": "Party"
+
+            },
+            {
+                "tag": "Ambient",
+                "category": "Style",
+                "group": "Soft"
+            },
+            {
+                "tag": "Bedroom",
+                "category": "Style",
+                "group": "Soft"
+            },
+            {
+                "tag": "Chillwave",
+                "category": "Style",
+                "group": "Soft"
+            },
+            {
+                "tag": "Ethereal",
+                "category": "Style",
+                "group": "Soft"
+            },
+            {
+                "tag": "Intimate",
+                "category": "Style",
+                "group": "Soft"
+            },
+            {
+                "tag": "Heat",
+                "category": "Style",
+                "group": "Soft"
+            },
+            {
+                "tag": "Sadcore",
+                "category": "Style",
+                "group": "Soft"
+
+            },
+            {
+                "tag": "Carnival",
+                "category": "Style",
+                "group": "Weird"
+            },
+            {
+                "tag": "Distorted",
+                "category": "Style",
+                "group": "Weird"
+            },
+            {
+                "tag": "Glitchy",
+                "category": "Style",
+                "group": "Weird"
+            },
+            {
+                "tag": "Haunted",
+                "category": "Style",
+                "group": "Weird"
+            },
+            {
+                "tag": "Hollow",
+                "category": "Style",
+                "group": "Weird"
+            },
+            {
+                "tag": "Musicbox",
+                "category": "Style",
+                "group": "Weird"
+            },
+            {
+                "tag": "Random",
+                "category": "Style",
+                "group": "Weird"
+
+            },
+            {
+                "tag": "Arabian",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Bangra",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Calypso",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Chalga",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Egyptian",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Hindustani",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Hōgaku",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Jewish Music",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Klezmer",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Matsuri",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Middle East",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Polka",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Russian Navy Song",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Suomipop",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+            {
+                "tag": "Tribal",
+                "category": "Style",
+                "group": "World/Ethnic"
+
+            },
+            {
+                "tag": "Appalachian",
+                "category": "Genre",
+                "group": "Country"
+            },
+            {
+                "tag": "Bluegrass",
+                "category": "Genre",
+                "group": "Country"
+            },
+            {
+                "tag": "Country",
+                "category": "Genre",
+                "group": "Country"
+            },
+            {
+                "tag": "Folk",
+                "category": "Genre",
+                "group": "Country"
+            },
+            {
+                "tag": "Freak Folk",
+                "category": "Genre",
+                "group": "Country"
+            },
+            {
+                "tag": "Western",
+                "category": "Genre",
+                "group": "Country"
+
+            },
+            {
+                "tag": "Afro-Cuban",
+                "category": "Genre",
+                "group": "Dance"
+            },
+            {
+                "tag": "Dance Pop",
+                "category": "Genre",
+                "group": "Dance"
+            },
+            {
+                "tag": "Disco",
+                "category": "Genre",
+                "group": "Dance"
+            },
+            {
+                "tag": "Dubstep",
+                "category": "Genre",
+                "group": "Dance"
+            },
+            {
+                "tag": "Disco Funk",
+                "category": "Genre",
+                "group": "Dance"
+            },
+            {
+                "tag": "EDM",
+                "category": "Genre",
+                "group": "Dance"
+            },
+            {
+                "tag": "Electro",
+                "category": "Genre",
+                "group": "Dance"
+            },
+            {
+                "tag": "High-NRG",
+                "category": "Genre",
+                "group": "Dance"
+            },
+            {
+                "tag": "House",
+                "category": "Genre",
+                "group": "Dance"
+            },
+            {
+                "tag": "Trance",
+                "category": "Genre",
+                "group": "Dance"
+
+            },
+            {
+                "tag": "Ambient",
+                "category": "Genre",
+                "group": "Downtempo"
+            },
+            {
+                "tag": "Downtempo",
+                "category": "Genre",
+                "group": "Downtempo"
+            },
+            {
+                "tag": "Synthwave",
+                "category": "Genre",
+                "group": "Downtempo"
+            },
+            {
+                "tag": "Trap",
+                "category": "Genre",
+                "group": "Downtempo"
+
+            },
+            {
+                "tag": "Cyberpunk",
+                "category": "Genre",
+                "group": "Electronic"
+            },
+            {
+                "tag": "Drum'n'bass",
+                "category": "Genre",
+                "group": "Electronic"
+            },
+            {
+                "tag": "Dubstep",
+                "category": "Genre",
+                "group": "Electronic"
+            },
+            {
+                "tag": "Electronic",
+                "category": "Genre",
+                "group": "Electronic"
+            },
+            {
+                "tag": "Hypnogogical",
+                "category": "Genre",
+                "group": "Electronic"
+            },
+            {
+                "tag": "Phonk",
+                "category": "Genre",
+                "group": "Electronic"
+            },
+            {
+                "tag": "Synthpop",
+                "category": "Genre",
+                "group": "Electronic"
+            },
+            {
+                "tag": "Techno",
+                "category": "Genre",
+                "group": "Electronic"
+            },
+            {
+                "tag": "Trap",
+                "category": "Genre",
+                "group": "Electronic"
+
+            },
+            {
+                "tag": "Bebop",
+                "category": "Genre",
+                "group": "Jazz/Soul"
+            },
+            {
+                "tag": "Gospel",
+                "category": "Genre",
+                "group": "Jazz/Soul"
+            },
+            {
+                "tag": "Electro",
+                "category": "Genre",
+                "group": "Jazz/Soul"
+            },
+            {
+                "tag": "Frutiger Aero",
+                "category": "Genre",
+                "group": "Jazz/Soul"
+            },
+            {
+                "tag": "Jazz",
+                "category": "Genre",
+                "group": "Jazz/Soul"
+            },
+            {
+                "tag": "Latin Jazz",
+                "category": "Genre",
+                "group": "Jazz/Soul"
+            },
+            {
+                "tag": "RnB",
+                "category": "Genre",
+                "group": "Jazz/Soul"
+            },
+            {
+                "tag": "Soul",
+                "category": "Genre",
+                "group": "Jazz/Soul"
+
+            },
+            {
+                "tag": "Bossa Nova",
+                "category": "Genre",
+                "group": "Latin"
+            },
+            {
+                "tag": "Latin Jazz",
+                "category": "Genre",
+                "group": "Latin"
+            },
+            {
+                "tag": "Forró",
+                "category": "Genre",
+                "group": "Latin"
+            },
+            {
+                "tag": "Mambo",
+                "category": "Genre",
+                "group": "Latin"
+            },
+            {
+                "tag": "Salsa",
+                "category": "Genre",
+                "group": "Latin"
+            },
+            {
+                "tag": "Tango",
+                "category": "Genre",
+                "group": "Latin"
+
+            },
+            {
+                "tag": "Afrobeat",
+                "category": "Genre",
+                "group": "Reggae"
+            },
+            {
+                "tag": "Dancehall",
+                "category": "Genre",
+                "group": "Reggae"
+            },
+            {
+                "tag": "Dub",
+                "category": "Genre",
+                "group": "Reggae"
+            },
+            {
+                "tag": "Reggae",
+                "category": "Genre",
+                "group": "Reggae"
+            },
+            {
+                "tag": "Reggaeton",
+                "category": "Genre",
+                "group": "Reggae"
+
+            },
+            {
+                "tag": "Black Metal",
+                "category": "Genre",
+                "group": "Metal"
+            },
+            {
+                "tag": "Deathcore",
+                "category": "Genre",
+                "group": "Metal"
+            },
+            {
+                "tag": "Death Metal",
+                "category": "Genre",
+                "group": "Metal"
+            },
+            {
+                "tag": "Heavy Metal",
+                "category": "Genre",
+                "group": "Metal"
+            },
+            {
+                "tag": "Heavy Metal Trap",
+                "category": "Genre",
+                "group": "Metal"
+            },
+            {
+                "tag": "Metalcore",
+                "category": "Genre",
+                "group": "Metal"
+            },
+            {
+                "tag": "Nu Metal",
+                "category": "Genre",
+                "group": "Metal"
+            },
+            {
+                "tag": "Power Metal",
+                "category": "Genre",
+                "group": "Metal"
+
+            },
+            {
+                "tag": "Pop",
+                "category": "Genre",
+                "group": "Popular"
+            },
+            {
+                "tag": "Dance Pop",
+                "category": "Genre",
+                "group": "Popular"
+            },
+            {
+                "tag": "Pop Rock",
+                "category": "Genre",
+                "group": "Popular"
+            },
+            {
+                "tag": "Kpop",
+                "category": "Genre",
+                "group": "Popular"
+            },
+            {
+                "tag": "Jpop",
+                "category": "Genre",
+                "group": "Popular"
+            },
+            {
+                "tag": "RnB",
+                "category": "Genre",
+                "group": "Popular"
+            },
+            {
+                "tag": "Synthpop",
+                "category": "Genre",
+                "group": "Popular"
+
+            },
+            {
+                "tag": "Classic Rock",
+                "category": "Genre",
+                "group": "Rock"
+            },
+            {
+                "tag": "Blues Rock",
+                "category": "Genre",
+                "group": "Rock"
+            },
+            {
+                "tag": "Emo",
+                "category": "Genre",
+                "group": "Rock"
+            },
+            {
+                "tag": "Glam Rock",
+                "category": "Genre",
+                "group": "Rock"
+            },
+            {
+                "tag": "Hardcore Punk",
+                "category": "Genre",
+                "group": "Rock"
+            },
+            {
+                "tag": "Indie",
+                "category": "Genre",
+                "group": "Rock"
+            },
+            {
+                "tag": "Industrial Rock",
+                "category": "Genre",
+                "group": "Rock"
+            },
+            {
+                "tag": "Punk",
+                "category": "Genre",
+                "group": "Rock"
+            },
+            {
+                "tag": "Rock",
+                "category": "Genre",
+                "group": "Rock"
+            },
+            {
+                "tag": "Skate Rock",
+                "category": "Genre",
+                "group": "Rock"
+            },
+            {
+                "tag": "Skatecore",
+                "category": "Genre",
+                "group": "Rock"
+            },
+            {
+                "tag": "Suomipop",
+                "category": "Genre",
+                "group": "Rock"
+
+            },
+            {
+                "tag": "Funk",
+                "category": "Genre",
+                "group": "Urban"
+            },
+            {
+                "tag": "Electro",
+                "category": "Genre",
+                "group": "Urban"
+            },
+            {
+                "tag": "HipHop",
+                "category": "Genre",
+                "group": "Urban"
+            },
+            {
+                "tag": "RnB",
+                "category": "Genre",
+                "group": "Urban"
+            },
+            {
+                "tag": "Phonk",
+                "category": "Genre",
+                "group": "Urban"
+            },
+            {
+                "tag": "Rap",
+                "category": "Genre",
+                "group": "Urban"
+            },
+            {
+                "tag": "Trap",
+                "category": "Genre",
+                "group": "Urban"
+
+            },
+            {
+                "tag": "Elevator",
+                "category": "Type",
+                "group": "Background"
+            },
+            {
+                "tag": "Jingle",
+                "category": "Type",
+                "group": "Background"
+            },
+            {
+                "tag": "Muzak",
+                "category": "Type",
+                "group": "Background"
+
+            },
+            {
+                "tag": "Adan",
+                "category": "Type",
+                "group": "Call to Prayer"
+            },
+            {
+                "tag": "Adjan",
+                "category": "Type",
+                "group": "Call to Prayer"
+            },
+            {
+                "tag": "Call to Prayer",
+                "category": "Type",
+                "group": "Call to Prayer"
+            },
+            {
+                "tag": "Gregorian Chant",
+                "category": "Type",
+                "group": "Call to Prayer"
+
+            },
+            {
+                "tag": "I Want Song",
+                "category": "Type",
+                "group": "Character"
+            },
+            {
+                "tag": "Hero Theme",
+                "category": "Type",
+                "group": "Character"
+            },
+            {
+                "tag": "Strut",
+                "category": "Type",
+                "group": "Character"
+            },
+            {
+                "tag": "March",
+                "category": "Type",
+                "group": "Character"
+            },
+            {
+                "tag": "Military",
+                "category": "Type",
+                "group": "Character"
+            },
+            {
+                "tag": "Villain Theme",
+                "category": "Type",
+                "group": "Character"
+
+            },
+            {
+                "tag": "Lullaby",
+                "category": "Type",
+                "group": "Children"
+            },
+            {
+                "tag": "Nursery Rhyme",
+                "category": "Type",
+                "group": "Children"
+            },
+            {
+                "tag": "Sing-along",
+                "category": "Type",
+                "group": "Children"
+            },
+            {
+                "tag": "Toddler",
+                "category": "Type",
+                "group": "Children"
+
+            },
+            {
+                "tag": "Adagio",
+                "category": "Type",
+                "group": "Composer"
+            },
+            {
+                "tag": "Adjunct",
+                "category": "Type",
+                "group": "Composer"
+            },
+            {
+                "tag": "Andante",
+                "category": "Type",
+                "group": "Composer"
+            },
+            {
+                "tag": "Allegro",
+                "category": "Type",
+                "group": "Composer"
+            },
+            {
+                "tag": "Capriccio",
+                "category": "Type",
+                "group": "Composer"
+
+            },
+            {
+                "tag": "Acoustic Guitar",
+                "category": "Type",
+                "group": "Instruments"
+            },
+            {
+                "tag": "Bass",
+                "category": "Type",
+                "group": "Instruments"
+            },
+            {
+                "tag": "Doublebass",
+                "category": "Type",
+                "group": "Instruments"
+            },
+            {
+                "tag": "Electricbass",
+                "category": "Type",
+                "group": "Instruments"
+            },
+            {
+                "tag": "Electric Guitar",
+                "category": "Type",
+                "group": "Instruments"
+            },
+            {
+                "tag": "Fingerstyle Guitar",
+                "category": "Type",
+                "group": "Instruments"
+            },
+            {
+                "tag": "Percussion",
+                "category": "Type",
+                "group": "Instruments"
+
+            },
+            {
+                "tag": "Chaotic",
+                "category": "Type",
+                "group": "Noise"
+            },
+            {
+                "tag": "Distorted",
+                "category": "Type",
+                "group": "Noise"
+            },
+            {
+                "tag": "Glitch",
+                "category": "Type",
+                "group": "Noise"
+            },
+            {
+                "tag": "Noise",
+                "category": "Type",
+                "group": "Noise"
+            },
+            {
+                "tag": "Random",
+                "category": "Type",
+                "group": "Noise"
+            },
+            {
+                "tag": "Stuttering",
+                "category": "Type",
+                "group": "Noise"
+
+            },
+            {
+                "tag": "glissando trombone",
+                "category": "Type",
+                "group": "Orchestral"
+            },
+            {
+                "tag": "legato cello",
+                "category": "Type",
+                "group": "Orchestral"
+            },
+            {
+                "tag": "Orchestral",
+                "category": "Type",
+                "group": "Orchestral"
+            },
+            {
+                "tag": "spiccato violins",
+                "category": "Type",
+                "group": "Orchestral"
+            },
+            {
+                "tag": "staccato viola",
+                "category": "Type",
+                "group": "Orchestral"
+            },
+            {
+                "tag": "Symphonic",
+                "category": "Type",
+                "group": "Orchestral"
+
+            },
+            {
+                "tag": "1960s",
+                "category": "Type",
+                "group": "Retro"
+            },
+            {
+                "tag": "Barbershop",
+                "category": "Type",
+                "group": "Retro"
+            },
+            {
+                "tag": "Big Band",
+                "category": "Type",
+                "group": "Retro"
+            },
+            {
+                "tag": "Classic",
+                "category": "Type",
+                "group": "Retro"
+            },
+            {
+                "tag": "Doo Wop",
+                "category": "Type",
+                "group": "Retro"
+            },
+            {
+                "tag": "Girl Group",
+                "category": "Type",
+                "group": "Retro"
+            },
+            {
+                "tag": "Mambo",
+                "category": "Type",
+                "group": "Retro"
+            },
+            {
+                "tag": "Salooncore",
+                "category": "Type",
+                "group": "Retro"
+            },
+            {
+                "tag": "Swing",
+                "category": "Type",
+                "group": "Retro"
+            },
+            {
+                "tag": "Traditional",
+                "category": "Type",
+                "group": "Retro"
+
+            },
+            {
+                "tag": "…core",
+                "category": "Type",
+                "group": "Suffix"
+            },
+            {
+                "tag": "…jam",
+                "category": "Type",
+                "group": "Suffix"
+            },
+            {
+                "tag": "…out",
+                "category": "Type",
+                "group": "Suffix"
+            },
+            {
+                "tag": "…wave",
+                "category": "Type",
+                "group": "Suffix"
+
+            },
+            {
+                "tag": "Americana",
+                "category": "Type",
+                "group": "Traditional"
+            },
+            {
+                "tag": "Barbershop",
+                "category": "Type",
+                "group": "Traditional"
+            },
+            {
+                "tag": "Christmas Carol",
+                "category": "Type",
+                "group": "Traditional"
+            },
+            {
+                "tag": "Traditional",
+                "category": "Type",
+                "group": "Traditional"
+
+            },
+            {
+                "tag": "A Cappella",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Arabian Ornamental",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Dispassionate",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Emotional",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Ethereal",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Gregorian chant",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Hindustani",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Lounge Singer",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Melismatic",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Monotone",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Narration",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Resonant",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Spoken Word",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Sprechgesang",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Sultry",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Scream",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Torchy",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Vocaloid",
+                "category": "Type",
+                "group": "Voice"
+            }
+        ]
+}
