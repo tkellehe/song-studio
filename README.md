@@ -1,7 +1,7 @@
 # [Song Studio - Suno](https://tkellehe.github.io/suno-song-studio/)  
 **A tool to make creating Suno prompts easier, faster, and more intuitive. Get closer to your desired results on the first try.**
 
-![Note Icon](./assets/note-icon.svg)
+![Note Icon](./assets/note-gradient-icon.svg)
 
 ---
 
