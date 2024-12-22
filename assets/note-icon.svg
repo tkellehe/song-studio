@@ -11,5 +11,5 @@
   <rect x="35" y="30" width="5" height="40" fill="black" />
 
   <!-- Square representing the flag -->
-  <rect x="40" y="30" width="20" height="20" fill="black" />
+  <rect x="40" y="30" width="15" height="20" fill="black" />
 </svg>
