@@ -12,9 +12,10 @@
       <stop offset="100%" stop-color="#ec4899" />
     </linearGradient>
 
-    <!-- Gradient for the square -->
+    <!-- Gradient for the square with more pink -->
     <linearGradient id="square-gradient" gradientTransform="rotate(45)">
       <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="75%" stop-color="#ec4899" />
       <stop offset="100%" stop-color="#06b6d4" />
     </linearGradient>
   </defs>
