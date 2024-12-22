@@ -27,5 +27,5 @@
   <rect x="35" y="30" width="5" height="40" fill="#ec4899" />
 
   <!-- Square representing the flag -->
-  <rect x="40" y="30" width="20" height="20" fill="url(#square-gradient)" />
+  <rect x="35" y="30" width="20" height="20" fill="url(#square-gradient)" />
 </svg>
