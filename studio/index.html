@@ -96,8 +96,8 @@
 
   <script>
     let timeoutId;
-    let model, descriptors, modelDescriptors;
-    let DATA; // Will hold the descriptors array for indexing by top/bottom N
+    let model, modelDescriptors;
+    let cachedDescriptors = null; // For caching the loaded descriptors array
 
     //==========================//
     //    Model Loading
@@ -124,19 +124,21 @@
       return modelDescriptors;
     }
 
-    // Load the descriptors JSON (the "DATA" array)
-    async function loadDescriptors() {
-      if (!descriptors) {
-        const response = await fetch('../models/v0.1/descriptors.json');
-        descriptors = await response.json();
-        console.log('Descriptors loaded');
-      }
-      return descriptors;
-    }
-
     //==========================//
     //   Descriptor Functions
     //==========================//
+
+    // Load descriptors array (the "descriptors" property from the JSON)
+    async function loadDescriptors() {
+      if (!cachedDescriptors) {
+        const response = await fetch('../models/v0.1/descriptors.json');
+        const data = await response.json();
+        // The JSON is in the form { "descriptors": [ ... ] }
+        cachedDescriptors = data.descriptors; 
+        console.log('Descriptors loaded');
+      }
+      return cachedDescriptors;
+    }
 
     // Return the single big tensor from the descriptors model
     async function getStackedEmbeddings() {
@@ -199,7 +201,10 @@
       }
     }
 
-    async function queryDescriptors(embedding, topN, bottomN) {
+    async function queryDescriptors(embedding, topN = 5, bottomN = 5) {
+      // Always fetch the descriptors array from loadDescriptors
+      const descriptorArray = await loadDescriptors();
+
       const scores = await dotProductTensor(embedding);
       // Keep track of tensors to dispose
       const tensorsToDispose = [scores];
@@ -221,12 +226,12 @@
         // Build arrays from top and bottom indices
         const tops = [];
         for (let i = 0; i < topN; i++) {
-          tops.push(DATA[topIndicesArray[i]]);
+          tops.push(descriptorArray[topIndicesArray[i]]);
         }
 
         const bottoms = [];
         for (let i = 0; i < bottomN; i++) {
-          bottoms.push(DATA[bottomIndicesArray[i]]);
+          bottoms.push(descriptorArray[bottomIndicesArray[i]]);
         }
 
         return { tops, bottoms };
@@ -246,11 +251,10 @@
       return useModel.embed(text);
     }
 
-    // Build descriptors based on cosine similarity (here, dot product is used)
-    async function buildCustomDescriptor(text, topN = 10, bottomN = 5) {
+    // Build descriptors based on "similarity" (dot product in this case)
+    async function buildCustomDescriptor(text, topN = 5, bottomN = 5) {
       const embedding = await getEmbedding(text);
       const { tops, bottoms } = await queryDescriptors(embedding, topN, bottomN);
-      embedding.dispose();
       return {
         include: buildDescriptorStrings(tops),
         exclude: buildDescriptorStrings(bottoms),
@@ -282,11 +286,10 @@
     window.onload = async () => {
       // Load main USE model
       await loadModel();
-      // Load descriptors array
-      let loadedDescriptors = await loadDescriptors();
-      DATA = loadedDescriptors; // Let queryDescriptors() reference them
-      // Load descriptor embeddings (modelDescriptors)
+      // Load descriptor embeddings (modelDescriptors) so they're ready
       await loadDescriptorsModel();
+      // Pre-cache the descriptors array
+      await loadDescriptors();
     };
   </script>
 </body>
