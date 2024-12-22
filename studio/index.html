@@ -264,6 +264,7 @@
     //==========================//
     //      Main Execution
     //==========================//
+    const DEBOUNCE = 500; // 500ms
 
     // Debounced prompt input
     document.getElementById('prompt-input').addEventListener('input', (event) => {
@@ -279,7 +280,7 @@
           document.getElementById('include-tags').value = '';
           document.getElementById('exclude-tags').value = '';
         }
-      }, 300);
+      }, DEBOUNCE);
     });
 
     // Preload the model and descriptors on page load
