@@ -79,6 +79,8 @@
       box-shadow: 0 0 10px #06b6d4;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
 </head>
 <body>
   <header>
@@ -90,5 +92,70 @@
     <textarea id="include-tags" placeholder="Include Tags" rows="5" readonly></textarea>
     <textarea id="exclude-tags" placeholder="Exclude Tags" rows="5" readonly></textarea>
   </div>
+  <script>
+    let timeoutId;
+    let model, DATA;
+
+    // Load the Universal Sentence Encoder model
+    async function loadModel() {
+      if (!model) {
+        model = await use.load();
+        console.log('Model loaded');
+      }
+      return model;
+    }
+
+    // Load the descriptors JSON
+    async function loadDescriptors() {
+      if (!DATA) {
+        const response = await fetch('../models/v0.1/descriptors.json');
+        DATA = await response.json();
+        console.log('Descriptors loaded');
+      }
+      return DATA;
+    }
+
+    // Get embedding for a given text
+    async function getEmbedding(text) {
+      const useModel = await loadModel();
+      return useModel.embed(text);
+    }
+
+    // Build descriptors based on cosine similarity
+    async function buildCustomDescriptor(text, topN = 5, bottomN = 5) {
+      const embedding = await getEmbedding(text);
+      const descriptors = await queryDescriptors(embedding, topN, bottomN);
+      return {
+        include: buildDescriptorStrings(descriptors.tops),
+        exclude: buildDescriptorStrings(descriptors.bottoms),
+      };
+    }
+
+    // Handle input changes with debounce
+    document.getElementById('prompt-input').addEventListener('input', async (event) => {
+      const text = event.target.value;
+
+      // Clear the previous timeout
+      clearTimeout(timeoutId);
+
+      // Set a new timeout
+      timeoutId = setTimeout(async () => {
+        if (text.trim().length > 0) {
+          const descriptors = await buildCustomDescriptor(text);
+          document.getElementById('include-tags').value = descriptors.include.join('\n');
+          document.getElementById('exclude-tags').value = descriptors.exclude.join('\n');
+        } else {
+          document.getElementById('include-tags').value = '';
+          document.getElementById('exclude-tags').value = '';
+        }
+      }, 300); // 300ms debounce
+    });
+
+    // Preload the model and descriptors on page load
+    window.onload = async () => {
+      await loadModel();
+      await loadDescriptors();
+    };
+  </script>
 </body>
 </html>
