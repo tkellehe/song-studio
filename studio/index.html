@@ -142,8 +142,8 @@
       timeoutId = setTimeout(async () => {
         if (text.trim().length > 0) {
           const descriptors = await buildCustomDescriptor(text);
-          document.getElementById('include-tags').value = descriptors.include.join('\n');
-          document.getElementById('exclude-tags').value = descriptors.exclude.join('\n');
+          document.getElementById('include-tags').value = descriptors.include.join(', ');
+          document.getElementById('exclude-tags').value = descriptors.exclude.join(', ');
         } else {
           document.getElementById('include-tags').value = '';
           document.getElementById('exclude-tags').value = '';
