@@ -38,7 +38,7 @@
       font-size: 2rem;
     }
 
-    /* Container for prompt, toggle, and button (all on one line) */
+    /* Container for prompt, button, and toggle (all on one line) */
     .input-row {
       display: flex;
       align-items: center;
@@ -145,16 +145,16 @@
       transform: translateX(25px);
     }
 
-    /* Button styling */
+    /* Button styling (logo only, centered, no background, but keep border) */
     button {
       display: flex;
       align-items: center;
-      gap: 5px;
+      justify-content: center;
       padding: 8px 16px;
       font-size: 1rem;
       border: 2px solid #06b6d4;
       border-radius: 5px;
-      background: linear-gradient(45deg, #06b6d4, #ec4899);
+      background: none;
       color: #ffffff;
       cursor: pointer;
     }
@@ -178,7 +178,7 @@
     <h1>Song Studio - Styler</h1>
   </header>
 
-  <!-- Input + Toggle + Button on one row -->
+  <!-- Input + Generate Button + Toggle on one row -->
   <div class="input-row">
     <input
       type="text"
@@ -186,15 +186,6 @@
       placeholder="Enter your prompt here"
       title="Enter the text for which you want to generate tags."
     />
-
-    <!-- Toggle Switch (debounce) -->
-    <label
-      class="toggle-switch"
-      title="Toggle live generation ON/OFF"
-    >
-      <input type="checkbox" id="debounce-toggle" checked />
-      <span class="slider"></span>
-    </label>
 
     <!-- Button to explicitly generate tags -->
     <button
@@ -205,8 +196,16 @@
         src="../assets/note-gradient-icon.svg"
         alt="Generate"
       />
-      Generate
     </button>
+
+    <!-- Toggle Switch (debounce) -->
+    <label
+      class="toggle-switch"
+      title="Toggle live generation ON/OFF"
+    >
+      <input type="checkbox" id="debounce-toggle" checked />
+      <span class="slider"></span>
+    </label>
   </div>
 
   <!-- Include/Exclude text areas -->
