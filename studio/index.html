@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Song Studio - Styler</title>
   <style>
     /* General reset */
@@ -79,6 +79,7 @@
       box-shadow: 0 0 10px #06b6d4;
     }
   </style>
+  <!-- TensorFlow.js and USE model scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
 </head>
@@ -92,53 +93,178 @@
     <textarea id="include-tags" placeholder="Include Tags" rows="5" readonly></textarea>
     <textarea id="exclude-tags" placeholder="Exclude Tags" rows="5" readonly></textarea>
   </div>
+
   <script>
     let timeoutId;
-    let model, DATA;
+    let model, descriptors, modelDescriptors;
+    let DATA; // Will hold the descriptors array for indexing by top/bottom N
+
+    //==========================//
+    //    Model Loading
+    //==========================//
 
     // Load the Universal Sentence Encoder model
     async function loadModel() {
       if (!model) {
         model = await use.load();
-        console.log('Model loaded');
+        console.log('USE Model loaded');
       }
       return model;
     }
 
-    // Load the descriptors JSON
-    async function loadDescriptors() {
-      if (!DATA) {
-        const response = await fetch('../models/v0.1/descriptors.json');
-        DATA = await response.json();
-        console.log('Descriptors loaded');
+    // Load the descriptors model for stacking embeddings
+    async function loadDescriptorsModel() {
+      if (!modelDescriptors) {
+        const response = await fetch('../models/v0.1/model-descriptors.json');
+        const jsonData = await response.json();
+        modelDescriptors = jsonData;
+        modelDescriptors.tfo = tf.tensor(jsonData.data, jsonData.shape, jsonData.dtype);
+        console.log('Descriptors Model loaded');
       }
-      return DATA;
+      return modelDescriptors;
     }
 
-    // Get embedding for a given text
+    // Load the descriptors JSON (the "DATA" array)
+    async function loadDescriptors() {
+      if (!descriptors) {
+        const response = await fetch('../models/v0.1/descriptors.json');
+        descriptors = await response.json();
+        console.log('Descriptors loaded');
+      }
+      return descriptors;
+    }
+
+    //==========================//
+    //   Descriptor Functions
+    //==========================//
+
+    // Return the single big tensor from the descriptors model
+    async function getStackedEmbeddings() {
+      await loadDescriptorsModel();
+      return modelDescriptors.tfo; 
+    }
+
+    function buildDescriptorStrings(descriptorArray) {
+      const categories = {};
+      descriptorArray.forEach(descriptor => {
+        if (!categories[descriptor.category]) {
+          categories[descriptor.category] = {
+            count: 0,
+            groups: {}
+          };
+        }
+        const category = categories[descriptor.category];
+        if (!category.groups[descriptor.group]) {
+          category.groups[descriptor.group] = [];
+        }
+        category.groups[descriptor.group].push(descriptor);
+        category.count++;
+      });
+
+      const descriptorStrings = [];
+
+      // For each category, collect group tags and build output string
+      for (const categoryName in categories) {
+        const categoryData = categories[categoryName];
+        for (const groupName in categoryData.groups) {
+          const groupData = categoryData.groups[groupName];
+          const concatList = [groupName];
+          for (const descriptor of groupData) {
+            if (descriptor.tag !== groupName) {
+              concatList.push(descriptor.tag);
+            }
+          }
+          descriptorStrings.push(concatList.join(' '));
+        }
+      }
+      return descriptorStrings;
+    }
+
+    async function dotProductTensor(embedding) {
+      // Get stacked descriptor embeddings
+      const stackedDescriptors = await getStackedEmbeddings();
+
+      // Keep track of tensors to dispose
+      const tensorsToDispose = [];
+
+      try {
+        // Compute dot product between query embedding and each descriptor embedding
+        const dotProducts = tf.matMul(embedding, stackedDescriptors, false, true);
+        tensorsToDispose.push(dotProducts);
+        // Shape of dotProducts is [1, num_descriptors], so we squeeze to [num_descriptors]
+        return dotProducts.squeeze();
+      } finally {
+        // Dispose of intermediate tensors
+        tensorsToDispose.forEach(tensor => tensor.dispose());
+      }
+    }
+
+    async function queryDescriptors(embedding, topN = 5, bottomN = 5) {
+      const scores = await dotProductTensor(embedding);
+      // Keep track of tensors to dispose
+      const tensorsToDispose = [scores];
+
+      try {
+        // Get top N
+        const { indices: topIndices, values: topValues } = tf.topk(scores, topN);
+        // For bottom N, multiply by -1 and do topk
+        const invertedScores = scores.mul(tf.scalar(-1));
+        const { indices: bottomIndices, values: bottomValues } = tf.topk(invertedScores, bottomN);
+
+        // Add all to disposal list
+        tensorsToDispose.push(topIndices, topValues, bottomIndices, bottomValues, invertedScores);
+
+        // Convert typed arrays
+        const topIndicesArray = topIndices.dataSync();
+        const bottomIndicesArray = bottomIndices.dataSync();
+
+        // Build arrays from top and bottom indices
+        const tops = [];
+        for (let i = 0; i < topN; i++) {
+          tops.push(DATA[topIndicesArray[i]]);
+        }
+
+        const bottoms = [];
+        for (let i = 0; i < bottomN; i++) {
+          bottoms.push(DATA[bottomIndicesArray[i]]);
+        }
+
+        return { tops, bottoms };
+      } finally {
+        // Dispose of intermediate tensors
+        tensorsToDispose.forEach(tensor => tensor.dispose());
+      }
+    }
+
+    //==========================//
+    //     Utility Functions
+    //==========================//
+
+    // Get embedding for a given text using the loaded USE model
     async function getEmbedding(text) {
       const useModel = await loadModel();
       return useModel.embed(text);
     }
 
-    // Build descriptors based on cosine similarity
+    // Build descriptors based on cosine similarity (here, dot product is used)
     async function buildCustomDescriptor(text, topN = 5, bottomN = 5) {
       const embedding = await getEmbedding(text);
-      const descriptors = await queryDescriptors(embedding, topN, bottomN);
+      const { tops, bottoms } = await queryDescriptors(embedding, topN, bottomN);
       return {
-        include: buildDescriptorStrings(descriptors.tops),
-        exclude: buildDescriptorStrings(descriptors.bottoms),
+        include: buildDescriptorStrings(tops),
+        exclude: buildDescriptorStrings(bottoms),
       };
     }
 
-    // Handle input changes with debounce
-    document.getElementById('prompt-input').addEventListener('input', async (event) => {
+    //==========================//
+    //      Main Execution
+    //==========================//
+
+    // Debounced prompt input
+    document.getElementById('prompt-input').addEventListener('input', (event) => {
       const text = event.target.value;
 
-      // Clear the previous timeout
       clearTimeout(timeoutId);
-
-      // Set a new timeout
       timeoutId = setTimeout(async () => {
         if (text.trim().length > 0) {
           const descriptors = await buildCustomDescriptor(text);
@@ -148,13 +274,18 @@
           document.getElementById('include-tags').value = '';
           document.getElementById('exclude-tags').value = '';
         }
-      }, 300); // 300ms debounce
+      }, 300);
     });
 
     // Preload the model and descriptors on page load
     window.onload = async () => {
+      // Load main USE model
       await loadModel();
-      await loadDescriptors();
+      // Load descriptors array
+      let loadedDescriptors = await loadDescriptors();
+      DATA = loadedDescriptors; // Let queryDescriptors() reference them
+      // Load descriptor embeddings (modelDescriptors)
+      await loadDescriptorsModel();
     };
   </script>
 </body>
