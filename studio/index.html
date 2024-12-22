@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
   <title>Song Studio - Styler</title>
   <style>
     /* General reset */
@@ -35,7 +38,18 @@
       font-size: 2rem;
     }
 
-    /* Input and output areas */
+    /* Container for prompt, toggle, and button (all on one line) */
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      margin-bottom: 15px;
+    }
+
+    /* Container for include/exclude textareas */
     .container {
       width: 90%;
       max-width: 600px;
@@ -44,6 +58,7 @@
       gap: 15px;
     }
 
+    /* Textarea styling */
     textarea {
       width: 100%;
       padding: 10px;
@@ -64,8 +79,9 @@
       box-shadow: 0 0 10px #06b6d4;
     }
 
-    input {
-      width: 100%;
+    /* Input styling */
+    input[type="text"] {
+      flex: 1;
       padding: 10px;
       font-size: 1rem;
       border: 2px solid #06b6d4;
@@ -74,9 +90,82 @@
       color: #ffffff;
     }
 
-    input:focus {
+    input[type="text"]:focus {
       outline: none;
       box-shadow: 0 0 10px #06b6d4;
+    }
+
+    /* Toggle Switch Container */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 25px;
+      flex-shrink: 0; /* keeps width from collapsing */
+    }
+
+    /* Hide default checkbox */
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    /* Slider */
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #555; /* Off state background */
+      transition: 0.4s;
+      border-radius: 25px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 19px;
+      width: 19px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #fff;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    /* When checked, move slider */
+    .toggle-switch input:checked + .slider {
+      background: linear-gradient(45deg, #06b6d4, #ec4899);
+    }
+
+    .toggle-switch input:checked + .slider:before {
+      transform: translateX(25px);
+    }
+
+    /* Button styling */
+    button {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 16px;
+      font-size: 1rem;
+      border: 2px solid #06b6d4;
+      border-radius: 5px;
+      background: linear-gradient(45deg, #06b6d4, #ec4899);
+      color: #ffffff;
+      cursor: pointer;
+    }
+
+    button img {
+      width: 20px;
+      height: 20px;
+    }
+
+    button:hover {
+      opacity: 0.85;
     }
   </style>
   <!-- TensorFlow.js and USE model scripts -->
@@ -85,19 +174,63 @@
 </head>
 <body>
   <header>
-    <img src="../assets/note-gradient-icon.svg" alt="Note Icon">
+    <img src="../assets/note-gradient-icon.svg" alt="Note Icon" />
     <h1>Song Studio - Styler</h1>
   </header>
+
+  <!-- Input + Toggle + Button on one row -->
+  <div class="input-row">
+    <input
+      type="text"
+      id="prompt-input"
+      placeholder="Enter your prompt here"
+      title="Enter the text for which you want to generate tags."
+    />
+
+    <!-- Toggle Switch (debounce) -->
+    <label
+      class="toggle-switch"
+      title="Toggle live generation ON/OFF"
+    >
+      <input type="checkbox" id="debounce-toggle" checked />
+      <span class="slider"></span>
+    </label>
+
+    <!-- Button to explicitly generate tags -->
+    <button
+      id="generate-button"
+      title="Click to generate tags if live toggle is OFF"
+    >
+      <img
+        src="../assets/note-gradient-icon.svg"
+        alt="Generate"
+      />
+      Generate
+    </button>
+  </div>
+
+  <!-- Include/Exclude text areas -->
   <div class="container">
-    <input type="text" id="prompt-input" placeholder="Enter your prompt here">
-    <textarea id="include-tags" placeholder="Include Tags" rows="5" readonly></textarea>
-    <textarea id="exclude-tags" placeholder="Exclude Tags" rows="5" readonly></textarea>
+    <textarea
+      id="include-tags"
+      placeholder="Include Tags"
+      rows="5"
+      readonly
+    ></textarea>
+    <textarea
+      id="exclude-tags"
+      placeholder="Exclude Tags"
+      rows="5"
+      readonly
+    ></textarea>
   </div>
 
   <script>
     let timeoutId;
     let model, modelDescriptors;
     let cachedDescriptors = null; // For caching the loaded descriptors array
+    const DEBOUNCE = 500; // 500ms
+    let lastButtonTextUsed = ""; // Keep track of the last text used by button
 
     //==========================//
     //    Model Loading
@@ -107,7 +240,7 @@
     async function loadModel() {
       if (!model) {
         model = await use.load();
-        console.log('USE Model loaded');
+        console.log("USE Model loaded");
       }
       return model;
     }
@@ -115,11 +248,15 @@
     // Load the descriptors model for stacking embeddings
     async function loadDescriptorsModel() {
       if (!modelDescriptors) {
-        const response = await fetch('../models/v0.1/model-descriptors.json');
+        const response = await fetch("../models/v0.1/model-descriptors.json");
         const jsonData = await response.json();
         modelDescriptors = jsonData;
-        modelDescriptors.tfo = tf.tensor(jsonData.data, jsonData.shape, jsonData.dtype);
-        console.log('Descriptors Model loaded');
+        modelDescriptors.tfo = tf.tensor(
+          jsonData.data,
+          jsonData.shape,
+          jsonData.dtype
+        );
+        console.log("Descriptors Model loaded");
       }
       return modelDescriptors;
     }
@@ -131,11 +268,11 @@
     // Load descriptors array (the "descriptors" property from the JSON)
     async function loadDescriptors() {
       if (!cachedDescriptors) {
-        const response = await fetch('../models/v0.1/descriptors.json');
+        const response = await fetch("../models/v0.1/descriptors.json");
         const data = await response.json();
         // The JSON is in the form { "descriptors": [ ... ] }
-        cachedDescriptors = data.descriptors; 
-        console.log('Descriptors loaded');
+        cachedDescriptors = data.descriptors;
+        console.log("Descriptors loaded");
       }
       return cachedDescriptors;
     }
@@ -143,16 +280,16 @@
     // Return the single big tensor from the descriptors model
     async function getStackedEmbeddings() {
       await loadDescriptorsModel();
-      return modelDescriptors.tfo; 
+      return modelDescriptors.tfo;
     }
 
     function buildDescriptorStrings(descriptorArray) {
       const categories = {};
-      descriptorArray.forEach(descriptor => {
+      descriptorArray.forEach((descriptor) => {
         if (!categories[descriptor.category]) {
           categories[descriptor.category] = {
             count: 0,
-            groups: {}
+            groups: {},
           };
         }
         const category = categories[descriptor.category];
@@ -176,7 +313,7 @@
               concatList.push(descriptor.tag);
             }
           }
-          descriptorStrings.push(concatList.join(' '));
+          descriptorStrings.push(concatList.join(" "));
         }
       }
       return descriptorStrings;
@@ -197,7 +334,7 @@
         return dotProducts.squeeze();
       } finally {
         // Dispose of intermediate tensors
-        tensorsToDispose.forEach(tensor => tensor.dispose());
+        tensorsToDispose.forEach((tensor) => tensor.dispose());
       }
     }
 
@@ -214,10 +351,19 @@
         const { indices: topIndices, values: topValues } = tf.topk(scores, topN);
         // For bottom N, multiply by -1 and do topk
         const invertedScores = scores.mul(tf.scalar(-1));
-        const { indices: bottomIndices, values: bottomValues } = tf.topk(invertedScores, bottomN);
+        const {
+          indices: bottomIndices,
+          values: bottomValues,
+        } = tf.topk(invertedScores, bottomN);
 
         // Add all to disposal list
-        tensorsToDispose.push(topIndices, topValues, bottomIndices, bottomValues, invertedScores);
+        tensorsToDispose.push(
+          topIndices,
+          topValues,
+          bottomIndices,
+          bottomValues,
+          invertedScores
+        );
 
         // Convert typed arrays
         const topIndicesArray = topIndices.dataSync();
@@ -237,7 +383,7 @@
         return { tops, bottoms };
       } finally {
         // Dispose of intermediate tensors
-        tensorsToDispose.forEach(tensor => tensor.dispose());
+        tensorsToDispose.forEach((tensor) => tensor.dispose());
       }
     }
 
@@ -264,23 +410,48 @@
     //==========================//
     //      Main Execution
     //==========================//
-    const DEBOUNCE = 500; // 500ms
+
+    const promptInput = document.getElementById("prompt-input");
+    const debounceToggle = document.getElementById("debounce-toggle");
+    const generateButton = document.getElementById("generate-button");
+
+    // Handler to actually build and populate the descriptors
+    async function handleDescriptorGeneration(text) {
+      if (text.trim().length > 0) {
+        const descriptors = await buildCustomDescriptor(text);
+        document.getElementById("include-tags").value =
+          descriptors.include.join(", ");
+        document.getElementById("exclude-tags").value =
+          descriptors.exclude.join(", ");
+      } else {
+        document.getElementById("include-tags").value = "";
+        document.getElementById("exclude-tags").value = "";
+      }
+    }
 
     // Debounced prompt input
-    document.getElementById('prompt-input').addEventListener('input', (event) => {
-      const text = event.target.value;
+    promptInput.addEventListener("input", () => {
+      // Only do live generation if toggle is ON
+      if (!debounceToggle.checked) return;
 
       clearTimeout(timeoutId);
+      const text = promptInput.value;
+
       timeoutId = setTimeout(async () => {
-        if (text.trim().length > 0) {
-          const descriptors = await buildCustomDescriptor(text);
-          document.getElementById('include-tags').value = descriptors.include.join(', ');
-          document.getElementById('exclude-tags').value = descriptors.exclude.join(', ');
-        } else {
-          document.getElementById('include-tags').value = '';
-          document.getElementById('exclude-tags').value = '';
-        }
+        await handleDescriptorGeneration(text);
       }, DEBOUNCE);
+    });
+
+    // Generate button handler
+    generateButton.addEventListener("click", async () => {
+      const text = promptInput.value;
+      // Only run if text changed since last button press
+      if (text.trim().length === 0) return; // no empty text
+      if (text === lastButtonTextUsed) return; // same as last used
+
+      // Update cache
+      lastButtonTextUsed = text;
+      await handleDescriptorGeneration(text);
     });
 
     // Preload the model and descriptors on page load
