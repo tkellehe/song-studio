@@ -201,7 +201,7 @@
       }
     }
 
-    async function queryDescriptors(embedding, topN = 5, bottomN = 5) {
+    async function queryDescriptors(embedding, topN, bottomN) {
       // Always fetch the descriptors array from loadDescriptors
       const descriptorArray = await loadDescriptors();
 
@@ -252,7 +252,7 @@
     }
 
     // Build descriptors based on "similarity" (dot product in this case)
-    async function buildCustomDescriptor(text, topN = 5, bottomN = 5) {
+    async function buildCustomDescriptor(text, topN = 10, bottomN = 5) {
       const embedding = await getEmbedding(text);
       const { tops, bottoms } = await queryDescriptors(embedding, topN, bottomN);
       return {
