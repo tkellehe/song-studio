@@ -38,14 +38,17 @@
       font-size: 2rem;
     }
 
-    /* Container for prompt, button, and toggle (all on one line) */
+    /*
+      Container for prompt, button, and toggle (all on one line).
+      Use width: 90% and max-width: 600px to match textareas below.
+      Remove margin: 0 auto to avoid extra right-side spacing.
+    */
     .input-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      width: 100%;
+      gap: 5px; /* reduced gap */
+      width: 90%;
       max-width: 600px;
-      margin: 0 auto;
       margin-bottom: 15px;
     }
 
@@ -145,7 +148,13 @@
       transform: translateX(25px);
     }
 
-    /* Button styling (logo only, centered, no background, but keep border) */
+    /*
+      Button styling:
+        - Linear gradient background
+        - "Generate" text only
+        - White text
+        - Keep the border
+    */
     button {
       display: flex;
       align-items: center;
@@ -154,14 +163,9 @@
       font-size: 1rem;
       border: 2px solid #06b6d4;
       border-radius: 5px;
-      background: none;
+      background: linear-gradient(45deg, #06b6d4, #ec4899);
       color: #ffffff;
       cursor: pointer;
-    }
-
-    button img {
-      width: 20px;
-      height: 20px;
     }
 
     button:hover {
@@ -192,10 +196,7 @@
       id="generate-button"
       title="Click to generate tags if live toggle is OFF"
     >
-      <img
-        src="../assets/note-gradient-icon.svg"
-        alt="Generate"
-      />
+      Generate
     </button>
 
     <!-- Toggle Switch (debounce) -->
@@ -347,22 +348,13 @@
 
       try {
         // Get top N
-        const { indices: topIndices, values: topValues } = tf.topk(scores, topN);
+        const { indices: topIndices } = tf.topk(scores, topN);
         // For bottom N, multiply by -1 and do topk
         const invertedScores = scores.mul(tf.scalar(-1));
-        const {
-          indices: bottomIndices,
-          values: bottomValues,
-        } = tf.topk(invertedScores, bottomN);
+        const { indices: bottomIndices } = tf.topk(invertedScores, bottomN);
 
         // Add all to disposal list
-        tensorsToDispose.push(
-          topIndices,
-          topValues,
-          bottomIndices,
-          bottomValues,
-          invertedScores
-        );
+        tensorsToDispose.push(topIndices, bottomIndices, invertedScores);
 
         // Convert typed arrays
         const topIndicesArray = topIndices.dataSync();
