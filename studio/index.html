@@ -40,13 +40,12 @@
 
     /*
       Container for prompt, button, and toggle (all on one line).
-      Use width: 90% and max-width: 600px to match textareas below.
-      Remove margin: 0 auto to avoid extra right-side spacing.
+      Uses width: 90% and max-width: 600px to match textareas below.
     */
     .input-row {
       display: flex;
       align-items: center;
-      gap: 5px; /* reduced gap */
+      gap: 5px; /* small gap */
       width: 90%;
       max-width: 600px;
       margin-bottom: 15px;
@@ -59,6 +58,16 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
+    }
+
+    /*
+      Each textarea is wrapped in a .textarea-container
+      so we can position the character count label absolutely.
+    */
+    .textarea-container {
+      position: relative;
+      /* Give extra padding on the right so the label doesn't overlap text. */
+      padding-right: 0;
     }
 
     /* Textarea styling */
@@ -80,6 +89,17 @@
     textarea:focus {
       outline: none;
       box-shadow: 0 0 10px #06b6d4;
+    }
+
+    /* Character count label in bottom-right of textarea container */
+    .char-label {
+      position: absolute;
+      bottom: 8px;       /* adjust as needed */
+      right: 10px;       /* adjust as needed */
+      font-size: 0.8rem;
+      color: #888;       /* subtle gray color */
+      pointer-events: none; /* ensure clicks pass through */
+      user-select: none;    /* not selectable text */
     }
 
     /* Input styling */
@@ -151,7 +171,7 @@
     /*
       Button styling:
         - Linear gradient background
-        - "Generate" text only
+        - "Generate" text
         - White text
         - Keep the border
     */
@@ -209,20 +229,27 @@
     </label>
   </div>
 
-  <!-- Include/Exclude text areas -->
+  <!-- Include/Exclude text areas (with .textarea-container for char labels) -->
   <div class="container">
-    <textarea
-      id="include-tags"
-      placeholder="Include Tags"
-      rows="5"
-      readonly
-    ></textarea>
-    <textarea
-      id="exclude-tags"
-      placeholder="Exclude Tags"
-      rows="5"
-      readonly
-    ></textarea>
+    <div class="textarea-container">
+      <textarea
+        id="include-tags"
+        placeholder="Include Tags"
+        rows="5"
+        readonly
+      ></textarea>
+      <div class="char-label" id="include-char-counter">0/200</div>
+    </div>
+
+    <div class="textarea-container">
+      <textarea
+        id="exclude-tags"
+        placeholder="Exclude Tags"
+        rows="5"
+        readonly
+      ></textarea>
+      <div class="char-label" id="exclude-char-counter">0/200</div>
+    </div>
   </div>
 
   <script>
@@ -231,6 +258,7 @@
     let cachedDescriptors = null; // For caching the loaded descriptors array
     const DEBOUNCE = 500; // 500ms
     let lastButtonTextUsed = ""; // Keep track of the last text used by button
+    const MAX_LENGTH = 200; // For label display: "XX/200"
 
     //==========================//
     //    Model Loading
@@ -398,6 +426,12 @@
       };
     }
 
+    // Update the "XX/200" label for a given text
+    function updateCharLabel(text, labelId) {
+      const length = text.length;
+      document.getElementById(labelId).textContent = `${length}/${MAX_LENGTH}`;
+    }
+
     //==========================//
     //      Main Execution
     //==========================//
@@ -410,13 +444,25 @@
     async function handleDescriptorGeneration(text) {
       if (text.trim().length > 0) {
         const descriptors = await buildCustomDescriptor(text);
-        document.getElementById("include-tags").value =
-          descriptors.include.join(", ");
-        document.getElementById("exclude-tags").value =
-          descriptors.exclude.join(", ");
+
+        // Build the strings
+        const incString = descriptors.include.join(", ");
+        const excString = descriptors.exclude.join(", ");
+
+        // Populate textareas
+        document.getElementById("include-tags").value = incString;
+        document.getElementById("exclude-tags").value = excString;
+
+        // Update char counters
+        updateCharLabel(incString, "include-char-counter");
+        updateCharLabel(excString, "exclude-char-counter");
       } else {
+        // If prompt is empty, clear the fields and set 0/200
         document.getElementById("include-tags").value = "";
         document.getElementById("exclude-tags").value = "";
+
+        updateCharLabel("", "include-char-counter");
+        updateCharLabel("", "exclude-char-counter");
       }
     }
 
@@ -453,6 +499,10 @@
       await loadDescriptorsModel();
       // Pre-cache the descriptors array
       await loadDescriptors();
+
+      // Initially set char counters to 0/200
+      updateCharLabel("", "include-char-counter");
+      updateCharLabel("", "exclude-char-counter");
     };
   </script>
 </body>
