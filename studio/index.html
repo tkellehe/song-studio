@@ -346,141 +346,189 @@
     }
 
     function buildDescriptorStrings(descriptorArray) {
-      // Helper: get the total length of finalStrings when joined with ", "
+      /**
+       * Helper that computes how many characters the array of strings would take
+       * if joined with ", ".
+       */
       function joinedLength(arr) {
-        // e.g., ["Guitar Acoustic", "Voice Male"] -> "Guitar Acoustic, Voice Male".length
+        // Example: ["Guitar Acoustic", "Piano"] -> "Guitar Acoustic, Piano".length
         return arr.join(", ").length;
       }
     
-      // This map will track groups by a unique key: category + " :: " + group
-      // because the same group name could theoretically appear under different categories
+      /**
+       * We keep a map from (category::group) -> groupObj to manage each group's info.
+       */
       const groupsMap = new Map();
     
-      // Our final descriptor strings (each element is something like "Voice Male Duet")
+      /**
+       * Our final list of strings, each one representing an entire group (e.g. "Voice Male", 
+       * or for instruments "Guitar, Piano").
+       */
       const finalStrings = [];
     
-      // Iterate descriptors in the original order
+      // Single-pass: process each descriptor in the order they appear
       for (let i = 0; i < descriptorArray.length; i++) {
         const descriptor = descriptorArray[i];
         const { category, group, tag } = descriptor;
     
-        // Unique key for this (category, group) pair
-        const groupKey = `${category} :: ${group}`;
+        // Unique key for identifying the group
+        const groupKey = `${category}::${group}`;
     
-        // If we have not seen this groupKey before, we attempt to create a new group entry
-        if (!groupsMap.has(groupKey)) {
-          // Start with just the group name
-          const groupObj = {
+        // Check if we already have a groupObj for (category, group)
+        let groupObj = groupsMap.get(groupKey);
+    
+        // If we don't, we need to create a new one:
+        if (!groupObj) {
+          groupObj = {
             category,
             group,
+            // For "Ignore" logic
             ignoreSeen: false,
-            chosenVoiceType: null, // For the Voice group
-            // This will be the string we display in finalStrings, e.g. "Guitar", then "Guitar Acoustic"
-            currentString: group,
-            // We'll keep track of whether we've added any tags beyond the group name
+            // For "Voice" group: track if we have selected "Male"/"Female"/"Duet"
+            chosenVoiceType: null,
+            // For "Instruments": store tags in an array instead of "GroupName + tags"
+            instrumentTags: [],
+            // Number of tags added (helps us know if we have no tags once we see "Ignore")
             tagCount: 0,
-            finalIndex: -1, // We'll store the index in finalStrings[] once we add it
+            // The index of this group's string inside finalStrings
+            finalIndex: -1,
           };
     
-          // Before actually inserting into finalStrings, check if adding this groupName alone fits the limit.
-          // Simulate adding it to finalStrings (with comma + space if not empty)
-          const simulated = [...finalStrings, groupObj.currentString];
+          // We'll construct an initial output string differently depending on the group
+          let initialOutput;
+          if (group === "Instruments") {
+            // For instruments, we do NOT show the group name; just start empty
+            initialOutput = "";
+          } else {
+            // For other groups, the initial output is just the group name
+            initialOutput = group;
+          }
+    
+          // Check if we can add this group at all (just the initial output):
+          const simulated = [...finalStrings, initialOutput.trim()];
           if (joinedLength(simulated) > 200) {
-            // If we can't even add the group name without going over 200, skip this group entirely
+            // We cannot even add the group name/empty string without going over 200
+            // => skip this group entirely
             continue;
           }
     
-          // Otherwise, push to finalStrings for real
-          groupsMap.set(groupKey, groupObj);
+          // Otherwise, we can add it
+          groupObj.currentString = initialOutput.trim(); // might be "" for Instruments
           groupObj.finalIndex = finalStrings.length;
           finalStrings.push(groupObj.currentString);
+          groupsMap.set(groupKey, groupObj);
         }
     
-        // Now we definitely have a groupObj for this groupKey (unless we skipped it)
-        const groupObj = groupsMap.get(groupKey);
-        // If it doesn’t exist, that means we skipped it because it couldn’t fit at all
+        // If groupObj doesn't exist, it means we skipped it due to character limit
         if (!groupObj) {
           continue;
         }
     
-        // If we've already encountered "Ignore" for this group, we skip further additions
+        // If we have already encountered "Ignore" for this group, skip any further tags
         if (groupObj.ignoreSeen) {
           continue;
         }
     
-        // If this descriptor is "Ignore", mark ignoreSeen
+        // If this descriptor is "Ignore", mark ignore and remove if no tags
         if (tag === "Ignore") {
           groupObj.ignoreSeen = true;
-    
-          // If we have not added any tags yet (tagCount == 0),
-          // that means the group has nothing beyond its name -> remove from finalStrings
+          // If no tags were added, remove the group from finalStrings
           if (groupObj.tagCount === 0) {
             // Remove from finalStrings
             finalStrings.splice(groupObj.finalIndex, 1);
-    
-            // Also remove from groupsMap
+            // Remove from map
             groupsMap.delete(groupKey);
     
-            // Now we need to fix up finalIndex for all subsequent groupObjs that come later in finalStrings
-            // because we removed an item from finalStrings. Let's do a quick re-sync:
-            for (let [_, gObj] of groupsMap) {
-              if (gObj.finalIndex > groupObj.finalIndex) {
-                gObj.finalIndex--;
+            // Fix up the finalIndex for subsequent items in finalStrings
+            for (const [_, otherGroupObj] of groupsMap) {
+              if (otherGroupObj.finalIndex > groupObj.finalIndex) {
+                otherGroupObj.finalIndex--;
               }
             }
           }
-          // Done handling "Ignore"
+          // Done with this descriptor
           continue;
         }
     
-        // Otherwise, see if we should add this descriptor's tag.
-        // Skip if the tag is exactly the group name, no need to duplicate
-        if (tag === groupObj.group) {
+        // If the tag is the same as the group name (for non-instruments), skip duplication
+        // (For Instruments group we never had a group name in the string, so no duplication.)
+        if (group !== "Instruments" && tag === group) {
           continue;
         }
     
-        // Handle "Voice" group logic: only one of ["Male", "Female", "Duet"]
+        // Special "Voice" group logic:
         const voiceTypes = new Set(["Male", "Female", "Duet"]);
-        if (groupObj.group === "Voice" && voiceTypes.has(tag)) {
-          // If we haven't chosen a voice type, let's try to add it
+        if (group === "Voice" && voiceTypes.has(tag)) {
+          // If we haven't chosen a voice type yet, try to add it
           if (!groupObj.chosenVoiceType) {
-            // Attempt to add
-            const newString = `${groupObj.currentString} ${tag}`;
-            // Let's simulate replacing the old string with newString in finalStrings
+            // Attempt to update the string
+            const maybeNewString = groupObj.currentString
+              ? groupObj.currentString + " " + tag
+              : tag; // in case groupObj.currentString was empty (unlikely for "Voice")
+    
+            // Simulate adding it to finalStrings
             const tempArray = [...finalStrings];
-            tempArray[groupObj.finalIndex] = newString;
+            tempArray[groupObj.finalIndex] = maybeNewString.trim();
     
             if (joinedLength(tempArray) <= 200) {
-              // We can safely add it
-              groupObj.currentString = newString;
+              // We can add
+              groupObj.currentString = maybeNewString.trim();
               groupObj.chosenVoiceType = tag;
               groupObj.tagCount++;
-              finalStrings[groupObj.finalIndex] = newString;
+              finalStrings[groupObj.finalIndex] = groupObj.currentString;
             }
-            // else skip adding this tag
+            // else skip
           }
-          // If we already have a chosenVoiceType, we skip adding a new one
+          // If we already have a chosenVoiceType, skip this new one
           continue;
         }
     
-        // If it's a regular descriptor, try to add it
-        const newString = `${groupObj.currentString} ${tag}`;
-        // Simulate replacing
+        // Special "Instruments" logic:
+        if (group === "Instruments") {
+          // We'll store instrument tags in groupObj.instrumentTags
+          // Then the final string is groupObj.instrumentTags.join(", ")
+          const newInstrumentTags = [...groupObj.instrumentTags, tag];
+          // Let's see what the new string would be
+          const maybeNewString = newInstrumentTags.join(", ");
+    
+          // Simulate replacing finalStrings[groupObj.finalIndex] with maybeNewString
+          const tempArray = [...finalStrings];
+          tempArray[groupObj.finalIndex] = maybeNewString;
+    
+          if (joinedLength(tempArray) <= 200) {
+            // We can add it
+            groupObj.instrumentTags = newInstrumentTags;
+            groupObj.currentString = maybeNewString;
+            groupObj.tagCount++;
+            finalStrings[groupObj.finalIndex] = maybeNewString;
+          }
+          // else skip
+          continue;
+        }
+    
+        // Otherwise, a normal group (non-Voice, non-Instruments)
+        // We append tags with a space separator
+        const maybeNewString = groupObj.currentString
+          ? groupObj.currentString + " " + tag
+          : tag; // (Should not be empty unless group name was empty, which it isn't)
+    
+        // Simulate
         const tempArray = [...finalStrings];
-        tempArray[groupObj.finalIndex] = newString;
+        tempArray[groupObj.finalIndex] = maybeNewString.trim();
     
         if (joinedLength(tempArray) <= 200) {
-          // We can add
-          groupObj.currentString = newString;
+          groupObj.currentString = maybeNewString.trim();
           groupObj.tagCount++;
-          finalStrings[groupObj.finalIndex] = newString;
+          finalStrings[groupObj.finalIndex] = groupObj.currentString;
         }
         // else skip
       }
     
-      // At this point, we’ve considered each descriptor in order and updated finalStrings accordingly.
-      // Because we handled "Ignore" on the fly (removing the group if it had no tags),
-      // we are done. finalStrings already reflects the items we could add without exceeding 200 chars.
+      // After processing all descriptors, finalStrings holds our result.  
+      // Each group's string will either be:
+      //   - "Voice Male"
+      //   - "Acoustic, Electric, Bass" (if group === "Instruments")
+      //   - "Percussion Drums" (some other group name + tags), etc.
     
       return finalStrings;
     }
