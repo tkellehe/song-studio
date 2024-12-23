@@ -347,38 +347,111 @@
 
     function buildDescriptorStrings(descriptorArray) {
       const categories = {};
+    
+      // 1) Group descriptors by category -> group
       descriptorArray.forEach((descriptor) => {
-        if (!categories[descriptor.category]) {
-          categories[descriptor.category] = {
-            count: 0,
+        const { category, group, tag } = descriptor;
+    
+        // Initialize if missing
+        if (!categories[category]) {
+          categories[category] = {
             groups: {},
           };
         }
-        const category = categories[descriptor.category];
-        if (!category.groups[descriptor.group]) {
-          category.groups[descriptor.group] = [];
+    
+        if (!categories[category].groups[group]) {
+          categories[category].groups[group] = [];
         }
-        category.groups[descriptor.group].push(descriptor);
-        category.count++;
+    
+        // Push descriptor into the correct bucket
+        categories[category].groups[group].push({ tag, group, category });
       });
-
-      const descriptorStrings = [];
-
-      // For each category, collect group tags and build output string
+    
+      // We'll collect all group strings in this array, 
+      // then enforce the 200-char limit afterward.
+      const allGroupStrings = [];
+    
+      // 2) For each category, build group-level strings
       for (const categoryName in categories) {
-        const categoryData = categories[categoryName];
-        for (const groupName in categoryData.groups) {
-          const groupData = categoryData.groups[groupName];
+        const { groups } = categories[categoryName];
+    
+        for (const groupName in groups) {
+          const groupData = groups[groupName];
+    
+          // 2a) If any descriptor has tag = "Ignore", skip the entire group
+          const shouldIgnoreGroup = groupData.some((desc) => desc.tag === "Ignore");
+          if (shouldIgnoreGroup) {
+            continue; // Skip this entire group
+          }
+    
+          // 2b) Handle the "Voice" group special logic:
+          //     Only allow one of ["Male", "Female", "Duet"].
+          let chosenVoiceType = null; 
+          const voiceTypes = new Set(["Male", "Female", "Duet"]);
+    
+          // Start building the string for this group
+          // Always start with the group name (e.g. "Voice")
           const concatList = [groupName];
+    
           for (const descriptor of groupData) {
-            if (descriptor.tag !== groupName) {
-              concatList.push(descriptor.tag);
+            const { tag } = descriptor;
+    
+            // Skip if the tag is exactly the same as the group name
+            // because we've already included the group name
+            if (tag === groupName) {
+              continue;
+            }
+    
+            // For "Voice" group, only keep one from "Male", "Female", "Duet"
+            if (groupName === "Voice" && voiceTypes.has(tag)) {
+              // If we haven't picked a voice type yet, pick this one
+              if (!chosenVoiceType) {
+                chosenVoiceType = tag;
+                concatList.push(tag);
+              }
+              // If we already picked one, skip
+              continue;
+            }
+    
+            // Otherwise, add the tag if it's not "Ignore" (we already skipped the group in that case)
+            if (tag !== "Ignore" && (!voiceTypes.has(tag) || groupName !== "Voice")) {
+              concatList.push(tag);
             }
           }
-          descriptorStrings.push(concatList.join(" "));
+    
+          // If the group has something to contribute (besides just the group name),
+          // create the group string.
+          // (Some people prefer always including the group name; if you need to 
+          //  omit the group name if it's alone, adjust accordingly.)
+          const groupString = concatList.join(" ");
+          allGroupStrings.push(groupString);
         }
       }
-      return descriptorStrings;
+    
+      // 3) Now we enforce the 200-character limit as we build the final result list.
+      const finalStrings = [];
+      let currentLength = 0;
+    
+      for (let i = 0; i < allGroupStrings.length; i++) {
+        const nextString = allGroupStrings[i];
+    
+        // Calculate if adding this string plus ", " would exceed 200 chars.
+        // Note that the first string added doesn't need a ", " in front.
+        const lengthIfAdded =
+          finalStrings.length === 0
+            ? currentLength + nextString.length
+            : currentLength + 2 + nextString.length; // +2 for ", "
+    
+        if (lengthIfAdded > 200) {
+          break;
+        }
+    
+        // Otherwise, add it
+        finalStrings.push(nextString);
+        currentLength = lengthIfAdded;
+      }
+    
+      return finalStrings;
     }
 
     async function dotProductTensor(embedding) {
