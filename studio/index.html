@@ -82,7 +82,6 @@
     */
     .textarea-container {
       position: relative;
-      /* We rely on textarea width: 100%, box-sizing: border-box */
     }
 
     /* Textarea styling */
@@ -129,8 +128,6 @@
       border-radius: 5px;
       background-color: #1e1e1e;
       color: #ffffff;
-
-      /* Also ensure input doesn't overflow if you prefer consistent styling */
       box-sizing: border-box;
     }
 
@@ -190,7 +187,7 @@
     }
 
     /*
-      Button styling:
+      Button styling (enabled state):
         - Linear gradient background
         - "Generate" text
         - White text
@@ -207,11 +204,26 @@
       background: linear-gradient(45deg, #06b6d4, #ec4899);
       color: #ffffff;
       cursor: pointer;
-      box-sizing: border-box; /* for consistency */
+      box-sizing: border-box;
+      transition: background 0.2s, color 0.2s, opacity 0.2s;
     }
 
     button:hover {
       opacity: 0.85;
+    }
+
+    /*
+      Disabled/Auto states:
+      - Gray background
+      - Lighter text color
+      - No hover effect (cursor: default)
+    */
+    .btn-disabled {
+      background: #444 !important;
+      color: #aaa !important;
+      border: 2px solid #444 !important;
+      cursor: default !important;
+      opacity: 1 !important; /* keep normal opacity */
     }
   </style>
   <!-- TensorFlow.js and USE model scripts -->
@@ -233,7 +245,7 @@
       title="Enter the text for which you want to generate tags."
     />
 
-    <!-- Button to explicitly generate tags -->
+    <!-- Button to explicitly generate tags (or show "Styling..." / "Auto") -->
     <button
       id="generate-button"
       title="Click to generate tags if live toggle is OFF"
@@ -454,16 +466,49 @@
       document.getElementById(labelId).textContent = `${length}/${MAX_LENGTH}`;
     }
 
+    //========================//
+    // Button State Management
+    //========================//
+
+    const generateButton = document.getElementById("generate-button");
+
+    // Switch button to normal "Generate" mode (toggle OFF)
+    function setButtonGenerate() {
+      generateButton.innerText = "Generate";
+      generateButton.disabled = false;
+      generateButton.classList.remove("btn-disabled");
+      generateButton.title = "Click to generate tags if live toggle is OFF";
+    }
+
+    // Switch button to "Styling..." (temporary busy state)
+    function setButtonStyling() {
+      generateButton.innerText = "Styling...";
+      generateButton.disabled = true;
+      generateButton.classList.add("btn-disabled");
+      generateButton.title = "Generating tags...";
+    }
+
+    // Switch button to "Auto" mode (toggle ON)
+    function setButtonAuto() {
+      generateButton.innerText = "Auto";
+      generateButton.disabled = true;
+      generateButton.classList.add("btn-disabled");
+      generateButton.title = "Auto-generation is ON";
+    }
+
     //==========================//
     //      Main Execution
     //==========================//
 
     const promptInput = document.getElementById("prompt-input");
     const debounceToggle = document.getElementById("debounce-toggle");
-    const generateButton = document.getElementById("generate-button");
 
     // Handler to actually build and populate the descriptors
     async function handleDescriptorGeneration(text) {
+      // Indicate busy state for the button
+      // We'll only do this if we are in auto mode or about to generate manually
+      setButtonStyling();
+
       if (text.trim().length > 0) {
         const descriptors = await buildCustomDescriptor(text);
 
@@ -486,6 +531,15 @@
         updateCharLabel("", "include-char-counter");
         updateCharLabel("", "exclude-char-counter");
       }
+
+      // After generation, revert the button state
+      if (debounceToggle.checked) {
+        // If auto mode is still on, show "Auto"
+        setButtonAuto();
+      } else {
+        // Otherwise, show "Generate"
+        setButtonGenerate();
+      }
     }
 
     // Debounced prompt input
@@ -503,6 +557,10 @@
 
     // Generate button handler
     generateButton.addEventListener("click", async () => {
+      // Only do something if toggle is OFF
+      // (because in auto mode, the button is disabled anyway)
+      if (debounceToggle.checked) return;
+
       const text = promptInput.value;
       // Only run if text changed since last button press
       if (text.trim().length === 0) return; // no empty text
@@ -511,6 +569,15 @@
       // Update cache
       lastButtonTextUsed = text;
       await handleDescriptorGeneration(text);
+    });
+
+    // Toggle switch change: switch button between "Auto" and "Generate"
+    debounceToggle.addEventListener("change", () => {
+      if (debounceToggle.checked) {
+        setButtonAuto();
+      } else {
+        setButtonGenerate();
+      }
     });
 
     // Preload the model and descriptors on page load
@@ -525,6 +592,13 @@
       // Initially set char counters to 0/200
       updateCharLabel("", "include-char-counter");
       updateCharLabel("", "exclude-char-counter");
+
+      // Set the button state based on toggle state (ON by default)
+      if (debounceToggle.checked) {
+        setButtonAuto();
+      } else {
+        setButtonGenerate();
+      }
     };
   </script>
 </body>
