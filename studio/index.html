@@ -537,8 +537,8 @@
       // Convert the array into the descriptors.
       const sorted = indices.arraySync().map((i) => descriptorArray[i])
       return {
-        include: buildDescriptorStrings(sorted),
-        exclude: buildDescriptorStrings(sorted.reverse()),
+        include: buildDescriptorStrings(sorted.slice(0, 100)),
+        exclude: buildDescriptorStrings(sorted.slice(-100).reverse()),
       };
     }
 
