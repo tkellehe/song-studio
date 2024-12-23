@@ -1249,6 +1249,184 @@
                 "tag": "Female",
                 "category": "Type",
                 "group": "Voice"
+            },
+        
+            {
+                "tag": "Ignore",
+                "category": "Style",
+                "group": "Danceable"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Style",
+                "group": "Dark"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Style",
+                "group": "Eclectic"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Style",
+                "group": "Emotion"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Style",
+                "group": "Hard"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Style",
+                "group": "Lyrical"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Style",
+                "group": "Magical"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Style",
+                "group": "Minimal"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Style",
+                "group": "Party"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Style",
+                "group": "Soft"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Style",
+                "group": "Weird"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Style",
+                "group": "World/Ethnic"
+            },
+
+            {
+                "tag": "Ignore",
+                "category": "Genre",
+                "group": "Country"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Genre",
+                "group": "Dance"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Genre",
+                "group": "Downtempo"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Genre",
+                "group": "Electronic"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Genre",
+                "group": "Jazz/Soul"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Genre",
+                "group": "Latin"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Genre",
+                "group": "Reggae"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Genre",
+                "group": "Metal"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Genre",
+                "group": "Popular"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Genre",
+                "group": "Rock"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Genre",
+                "group": "Urban"
+            },
+
+            {
+                "tag": "Ignore",
+                "category": "Type",
+                "group": "Background"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Type",
+                "group": "Call to Prayer"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Type",
+                "group": "Character"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Type",
+                "group": "Children"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Type",
+                "group": "Composer"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Type",
+                "group": "Instruments"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Type",
+                "group": "Noise"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Type",
+                "group": "Orchestral"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Type",
+                "group": "Retro"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Type",
+                "group": "Suffix"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Type",
+                "group": "Traditional"
+            },
+            {
+                "tag": "Ignore",
+                "category": "Type",
+                "group": "Voice"
             }
         ]
 }
