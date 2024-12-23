@@ -1233,6 +1233,22 @@
                 "tag": "Vocaloid",
                 "category": "Type",
                 "group": "Voice"
+            },
+        
+            {
+                "tag": "Duet",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Male",
+                "category": "Type",
+                "group": "Voice"
+            },
+            {
+                "tag": "Female",
+                "category": "Type",
+                "group": "Voice"
             }
         ]
 }
