@@ -400,40 +400,13 @@
       }
     }
 
-    async function queryDescriptors(embedding, topN, bottomN) {
-      // Always fetch the descriptors array from loadDescriptors
-      const descriptorArray = await loadDescriptors();
-
+    async function queryDescriptors(embedding) {
       const scores = await dotProductTensor(embedding);
       // Keep track of tensors to dispose
       const tensorsToDispose = [scores];
 
       try {
-        // Get top N
-        const { indices: topIndices } = tf.topk(scores, topN);
-        // For bottom N, multiply by -1 and do topk
-        const invertedScores = scores.mul(tf.scalar(-1));
-        const { indices: bottomIndices } = tf.topk(invertedScores, bottomN);
-
-        // Add all to disposal list
-        tensorsToDispose.push(topIndices, bottomIndices, invertedScores);
-
-        // Convert typed arrays
-        const topIndicesArray = topIndices.dataSync();
-        const bottomIndicesArray = bottomIndices.dataSync();
-
-        // Build arrays from top and bottom indices
-        const tops = [];
-        for (let i = 0; i < topN; i++) {
-          tops.push(descriptorArray[topIndicesArray[i]]);
-        }
-
-        const bottoms = [];
-        for (let i = 0; i < bottomN; i++) {
-          bottoms.push(descriptorArray[bottomIndicesArray[i]]);
-        }
-
-        return { tops, bottoms };
+        return tf.topk(scores, scores.size);
       } finally {
         // Dispose of intermediate tensors
         tensorsToDispose.forEach((tensor) => tensor.dispose());
@@ -452,11 +425,16 @@
 
     // Build descriptors based on "similarity" (dot product in this case)
     async function buildCustomDescriptor(text, topN = 10, bottomN = 5) {
+      const descriptorArray = await loadDescriptors();
       const embedding = await getEmbedding(text);
-      const { tops, bottoms } = await queryDescriptors(embedding, topN, bottomN);
+      const { values, indices } = await queryDescriptors(embedding);
+      // Not using values at this time.
+      values.dispose();
+      // Convert the array into the descriptors.
+      const sorted = indices.arraySync().map((i) => descriptorArray[i])
       return {
-        include: buildDescriptorStrings(tops),
-        exclude: buildDescriptorStrings(bottoms),
+        include: buildDescriptorStrings(sorted.slice(0, topN)),
+        exclude: buildDescriptorStrings(sorted.slice(-bottomN)),
       };
     }
 
