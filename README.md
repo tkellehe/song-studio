@@ -20,7 +20,7 @@ The initial version prioritizes functionality over optimization, providing a con
 - **Prompt-to-Tags:**  
   Transform your descriptions of styles, genres, sounds, or songs into actionable tags.  
   - Suggests *include* and *exclude* tags to help Suno better reflect your desired characteristics.  
-  - Combines over **240 unique tags** to produce results that are closer to your vision on the first try.
+  - Combines over **243 unique tags** to produce results that are closer to your vision on the first try.
 
 ---
 
