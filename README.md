@@ -8,7 +8,7 @@
 ## About  
 **Song Studio - Suno** is designed to simplify the process of crafting prompts for Suno. By leveraging client-side tools, this project ensures a seamless experience across multiple browsers—including mobile. 
 
-### Current Version: **v0**  
+### Current Version: [**v0**](https://tkellehe.github.io/suno-song-studio/studio/index.html)
 This project operates entirely through GitHub Pages, requiring tools and models to run client-side. The beta version will incorporate **TensorFlow.js (tfjs)**, utilizing its **Universal Sentence Encoder (USE)** model for embeddings. This enables fast performance across platforms, including mobile devices.
 
 ---
