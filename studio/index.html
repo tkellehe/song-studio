@@ -9,8 +9,24 @@
   <title>Song Studio - Styler</title>
   <style>
     /* General reset */
+    html,
     body {
       margin: 0;
+      padding: 0;
+    }
+
+    /*
+      Use box-sizing: border-box globally, so widths
+      include padding & borders. This helps prevent
+      overflows in containers.
+    */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
       font-family: Arial, sans-serif;
       background-color: #121212;
       color: #ffffff;
@@ -66,6 +82,7 @@
     */
     .textarea-container {
       position: relative;
+      /* We rely on textarea width: 100%, box-sizing: border-box */
     }
 
     /* Textarea styling */
@@ -82,6 +99,9 @@
       resize: none;
       font-size: 1rem;
       line-height: 1.5;
+
+      /* Important: keep width within container */
+      box-sizing: border-box;
     }
 
     textarea:focus {
@@ -92,10 +112,10 @@
     /* Character count label in bottom-right of textarea container */
     .char-label {
       position: absolute;
-      bottom: 8px;       /* adjust as needed */
-      right: 10px;       /* adjust as needed */
+      bottom: 8px; /* adjust as needed */
+      right: 10px; /* adjust as needed */
       font-size: 0.8rem;
-      color: #888;       /* subtle gray color */
+      color: #888; /* subtle gray color */
       pointer-events: none; /* ensure clicks pass through */
       user-select: none;    /* not selectable text */
     }
@@ -109,6 +129,9 @@
       border-radius: 5px;
       background-color: #1e1e1e;
       color: #ffffff;
+
+      /* Also ensure input doesn't overflow if you prefer consistent styling */
+      box-sizing: border-box;
     }
 
     input[type="text"]:focus {
@@ -184,16 +207,11 @@
       background: linear-gradient(45deg, #06b6d4, #ec4899);
       color: #ffffff;
       cursor: pointer;
+      box-sizing: border-box; /* for consistency */
     }
 
     button:hover {
       opacity: 0.85;
-    }
-
-    /* Disabled button style */
-    button:disabled {
-      cursor: not-allowed;
-      opacity: 0.6;
     }
   </style>
   <!-- TensorFlow.js and USE model scripts -->
@@ -486,21 +504,13 @@
     // Generate button handler
     generateButton.addEventListener("click", async () => {
       const text = promptInput.value;
-      // If empty or same as last used, skip
-      if (text.trim().length === 0) return;
-      if (text === lastButtonTextUsed) return;
+      // Only run if text changed since last button press
+      if (text.trim().length === 0) return; // no empty text
+      if (text === lastButtonTextUsed) return; // same as last used
 
-      // Lock the button to prevent multiple clicks; show "Styling..."
-      generateButton.disabled = true;
-      generateButton.textContent = "Styling...";
-
-      // Perform generation
+      // Update cache
       lastButtonTextUsed = text;
       await handleDescriptorGeneration(text);
-
-      // Re-enable button
-      generateButton.disabled = false;
-      generateButton.textContent = "Generate";
     });
 
     // Preload the model and descriptors on page load
