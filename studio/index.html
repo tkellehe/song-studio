@@ -497,7 +497,7 @@
     }
 
     // Build descriptors based on "similarity" (dot product in this case)
-    async function buildCustomDescriptor(text, topN = 10, bottomN = 5) {
+    async function buildCustomDescriptor(text) {
       const descriptorArray = await loadDescriptors();
       const embedding = await getEmbedding(text);
       const { values, indices } = await queryDescriptors(embedding);
@@ -506,8 +506,8 @@
       // Convert the array into the descriptors.
       const sorted = indices.arraySync().map((i) => descriptorArray[i])
       return {
-        include: buildDescriptorStrings(sorted.slice(0, topN)),
-        exclude: buildDescriptorStrings(sorted.slice(-bottomN)),
+        include: buildDescriptorStrings(sorted),
+        exclude: buildDescriptorStrings(sorted.reverse()),
       };
     }
 
