@@ -241,7 +241,7 @@ export async function getSongStyles(text) {
   // Define thresholds relative to the top score
   const topScore = sorted[0].score;
   const includeThreshold = topScore - 0.02;
-  const excludeThreshold = topScore - 0.045;
+  const excludeThreshold = topScore - 0.04;
 
   // 1) Find where scores drop below the include threshold:
   //    i.e., the first index where score < includeThreshold.
