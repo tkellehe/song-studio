@@ -212,7 +212,7 @@ function buildDescriptorStrings(descriptorArray) {
     }
   }
 
-  return finalStrings;
+  return finalStrings.filter((s) => s?.trim()?.length);
 }
 
 /**
