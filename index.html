@@ -2,41 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Song Studio - Styler</title>
+  
   <!-- External CSS -->
-  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+  
+  <!-- TensorFlow.js and USE model scripts (still loaded from CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
 </head>
+
 <body>
   <header>
-    <img src="./assets/note-gradient-icon.svg" alt="Note Icon" />
+    <!-- Updated path to assets/ -->
+    <img src="assets/note-gradient-icon.svg" alt="Note Icon" />
     <h1>Song Studio - Styler</h1>
   </header>
 
+  <!-- Input + Generate Button + Toggle on one row -->
   <div class="input-row">
-    <input type="text" id="prompt-input" placeholder="Enter your prompt here" />
-    <button id="generate-button">Generate</button>
-    <label class="toggle-switch">
+    <input
+      type="text"
+      id="prompt-input"
+      placeholder="Enter your prompt here"
+      title="Enter the text for which you want to generate tags."
+    />
+
+    <button
+      id="generate-button"
+      title="Click to generate tags if live toggle is OFF"
+    >
+      Generate
+    </button>
+
+    <label
+      class="toggle-switch"
+      title="Toggle live generation ON/OFF"
+    >
       <input type="checkbox" id="debounce-toggle" checked />
       <span class="slider"></span>
     </label>
   </div>
 
+  <!-- Include/Exclude text areas -->
   <div class="container">
     <div class="textarea-container">
-      <textarea id="include-tags" placeholder="Include Tags" rows="5" readonly></textarea>
+      <textarea
+        id="include-tags"
+        placeholder="Include Tags"
+        rows="5"
+        readonly
+      ></textarea>
       <div class="char-label" id="include-char-counter">0/200</div>
     </div>
+
     <div class="textarea-container">
-      <textarea id="exclude-tags" placeholder="Exclude Tags" rows="5" readonly></textarea>
+      <textarea
+        id="exclude-tags"
+        placeholder="Exclude Tags"
+        rows="5"
+        readonly
+      ></textarea>
       <div class="char-label" id="exclude-char-counter">0/200</div>
     </div>
   </div>
 
-  <!-- External JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
-  <script src="./js/styler.js"></script>
-  <script src="./js/page-styler.js"></script>
+  <!-- Your Styler logic -->
+  <script src="js/styler.js"></script>
+
+  <!-- Page logic that uses the styler logic -->
+  <script src="js/page-styler.js"></script>
 </body>
 </html>
