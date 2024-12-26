@@ -1,10 +1,10 @@
 // js/page-styler.js
 
-import { 
-  loadModel, 
+import {
+  loadModel,
   loadDescriptorsModel,
   loadDescriptors,
-  getSongStyles 
+  getSongStyles
 } from './styler.js';
 
 const DEBOUNCE = 500;
@@ -16,13 +16,17 @@ const generateButton = document.getElementById("generate-button");
 const promptInput = document.getElementById("prompt-input");
 const debounceToggle = document.getElementById("debounce-toggle");
 
-// Update the "XX/200" label
+/**
+ * Update the "XX/200" label for a given textarea.
+ */
 function updateCharLabel(text, labelId) {
   const length = text.length;
   document.getElementById(labelId).textContent = `${length}/${MAX_LENGTH}`;
 }
 
-// Button state
+/**
+ * Button state management.
+ */
 function setButtonGenerate() {
   generateButton.innerText = "Generate";
   generateButton.disabled = false;
@@ -44,7 +48,9 @@ function setButtonAuto() {
   generateButton.title = "Auto-generation is ON";
 }
 
-// The core function that uses getSongStyles and populates the DOM
+/**
+ * The core function that uses getSongStyles and populates the DOM.
+ */
 async function handleDescriptorGeneration(text) {
   setButtonStyling();
 
@@ -59,13 +65,14 @@ async function handleDescriptorGeneration(text) {
     updateCharLabel(incString, "include-char-counter");
     updateCharLabel(excString, "exclude-char-counter");
   } else {
-    // Clear the fields if empty
+    // If prompt is empty, clear the fields and reset counters
     document.getElementById("include-tags").value = "";
     document.getElementById("exclude-tags").value = "";
     updateCharLabel("", "include-char-counter");
     updateCharLabel("", "exclude-char-counter");
   }
 
+  // Return button to either "Auto" (if toggle ON) or "Generate" (if toggle OFF).
   if (debounceToggle.checked) {
     setButtonAuto();
   } else {
@@ -73,32 +80,38 @@ async function handleDescriptorGeneration(text) {
   }
 }
 
-// Event: Debounced prompt input
+/**
+ * Debounced input event on the prompt text field.
+ */
 promptInput.addEventListener("input", () => {
-  if (!debounceToggle.checked) return; // only auto-generate if toggle is ON
+  // Only do live generation if toggle is ON
+  if (!debounceToggle.checked) return;
 
   clearTimeout(timeoutId);
   const text = promptInput.value;
 
-  timeoutId = setTimeout(async () => {
-    await handleDescriptorGeneration(text);
+  timeoutId = setTimeout(() => {
+    handleDescriptorGeneration(text);
   }, DEBOUNCE);
 });
 
-// Event: Generate button (manual mode)
+/**
+ * Generate button: only relevant if toggle is OFF (manual).
+ */
 generateButton.addEventListener("click", async () => {
-  // Only relevant if toggle is OFF
-  if (debounceToggle.checked) return;
+  if (debounceToggle.checked) return; // do nothing if auto is ON
 
   const text = promptInput.value;
-  if (text.trim().length === 0) return; // no empty text
-  if (text === lastButtonTextUsed) return; // no repetition
+  if (text.trim().length === 0) return; // no empty
+  if (text === lastButtonTextUsed) return; // same as last used
 
   lastButtonTextUsed = text;
   await handleDescriptorGeneration(text);
 });
 
-// Event: Toggle switch
+/**
+ * Toggle switch changes between auto and manual.
+ */
 debounceToggle.addEventListener("change", () => {
   if (debounceToggle.checked) {
     setButtonAuto();
@@ -107,18 +120,20 @@ debounceToggle.addEventListener("change", () => {
   }
 });
 
-// On page load
+/**
+ * On page load: pre-load the models and descriptors, init button states.
+ */
 window.onload = async () => {
-  // Preload models and descriptors
+  // Preload everything
   await loadModel();
   await loadDescriptorsModel();
   await loadDescriptors();
 
-  // Set char counters to 0/200 initially
+  // Initialize char counters
   updateCharLabel("", "include-char-counter");
   updateCharLabel("", "exclude-char-counter");
 
-  // Setup the button state
+  // Setup button based on toggle
   if (debounceToggle.checked) {
     setButtonAuto();
   } else {
