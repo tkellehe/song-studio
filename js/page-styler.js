@@ -170,4 +170,4 @@ window.onload = async () => {
 };
 
 // Export the getSongStyles function to be used in the browser.
-export getSongStyles;
+export { getSongStyles };
