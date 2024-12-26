@@ -1,65 +1,127 @@
-import { buildCustomDescriptor } from './styler.js';
+// js/page-styler.js
 
+import { 
+  loadModel, 
+  loadDescriptorsModel,
+  loadDescriptors,
+  getSongStyles 
+} from './styler.js';
+
+const DEBOUNCE = 500;
+let timeoutId;
+let lastButtonTextUsed = "";
 const MAX_LENGTH = 200;
 
+const generateButton = document.getElementById("generate-button");
+const promptInput = document.getElementById("prompt-input");
+const debounceToggle = document.getElementById("debounce-toggle");
+
+// Update the "XX/200" label
 function updateCharLabel(text, labelId) {
   const length = text.length;
   document.getElementById(labelId).textContent = `${length}/${MAX_LENGTH}`;
 }
 
-function setButtonState(button, state) {
-  const states = {
-    generate: { text: "Generate", disabled: false },
-    styling: { text: "Styling...", disabled: true },
-    auto: { text: "Auto", disabled: true },
-  };
-  const { text, disabled } = states[state];
-  button.textContent = text;
-  button.disabled = disabled;
+// Button state
+function setButtonGenerate() {
+  generateButton.innerText = "Generate";
+  generateButton.disabled = false;
+  generateButton.classList.remove("btn-disabled");
+  generateButton.title = "Click to generate tags if live toggle is OFF";
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const promptInput = document.getElementById("prompt-input");
-  const generateButton = document.getElementById("generate-button");
-  const debounceToggle = document.getElementById("debounce-toggle");
+function setButtonStyling() {
+  generateButton.innerText = "Styling...";
+  generateButton.disabled = true;
+  generateButton.classList.add("btn-disabled");
+  generateButton.title = "Generating tags...";
+}
 
-  promptInput.addEventListener("input", debounce(async () => {
-    if (!debounceToggle.checked) return;
+function setButtonAuto() {
+  generateButton.innerText = "Auto";
+  generateButton.disabled = true;
+  generateButton.classList.add("btn-disabled");
+  generateButton.title = "Auto-generation is ON";
+}
 
-    const text = promptInput.value;
-    const descriptors = await buildCustomDescriptor(text);
-    document.getElementById("include-tags").value = descriptors.include.join(", ");
-    document.getElementById("exclude-tags").value = descriptors.exclude.join(", ");
+// The core function that uses getSongStyles and populates the DOM
+async function handleDescriptorGeneration(text) {
+  setButtonStyling();
 
-    updateCharLabel(descriptors.include.join(", "), "include-char-counter");
-    updateCharLabel(descriptors.exclude.join(", "), "exclude-char-counter");
-  }, 500));
+  if (text.trim().length > 0) {
+    const descriptors = await getSongStyles(text);
+    const incString = descriptors.include.join(", ");
+    const excString = descriptors.exclude.join(", ");
 
-  generateButton.addEventListener("click", async () => {
-    const text = promptInput.value.trim();
-    if (!text) return;
+    document.getElementById("include-tags").value = incString;
+    document.getElementById("exclude-tags").value = excString;
 
-    setButtonState(generateButton, "styling");
+    updateCharLabel(incString, "include-char-counter");
+    updateCharLabel(excString, "exclude-char-counter");
+  } else {
+    // Clear the fields if empty
+    document.getElementById("include-tags").value = "";
+    document.getElementById("exclude-tags").value = "";
+    updateCharLabel("", "include-char-counter");
+    updateCharLabel("", "exclude-char-counter");
+  }
 
-    const descriptors = await buildCustomDescriptor(text);
-    document.getElementById("include-tags").value = descriptors.include.join(", ");
-    document.getElementById("exclude-tags").value = descriptors.exclude.join(", ");
+  if (debounceToggle.checked) {
+    setButtonAuto();
+  } else {
+    setButtonGenerate();
+  }
+}
 
-    updateCharLabel(descriptors.include.join(", "), "include-char-counter");
-    updateCharLabel(descriptors.exclude.join(", "), "exclude-char-counter");
+// Event: Debounced prompt input
+promptInput.addEventListener("input", () => {
+  if (!debounceToggle.checked) return; // only auto-generate if toggle is ON
 
-    setButtonState(generateButton, debounceToggle.checked ? "auto" : "generate");
-  });
+  clearTimeout(timeoutId);
+  const text = promptInput.value;
 
-  debounceToggle.addEventListener("change", () => {
-    setButtonState(generateButton, debounceToggle.checked ? "auto" : "generate");
-  });
+  timeoutId = setTimeout(async () => {
+    await handleDescriptorGeneration(text);
+  }, DEBOUNCE);
 });
 
-function debounce(func, wait) {
-  let timeout;
-  return function (...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
-}
+// Event: Generate button (manual mode)
+generateButton.addEventListener("click", async () => {
+  // Only relevant if toggle is OFF
+  if (debounceToggle.checked) return;
+
+  const text = promptInput.value;
+  if (text.trim().length === 0) return; // no empty text
+  if (text === lastButtonTextUsed) return; // no repetition
+
+  lastButtonTextUsed = text;
+  await handleDescriptorGeneration(text);
+});
+
+// Event: Toggle switch
+debounceToggle.addEventListener("change", () => {
+  if (debounceToggle.checked) {
+    setButtonAuto();
+  } else {
+    setButtonGenerate();
+  }
+});
+
+// On page load
+window.onload = async () => {
+  // Preload models and descriptors
+  await loadModel();
+  await loadDescriptorsModel();
+  await loadDescriptors();
+
+  // Set char counters to 0/200 initially
+  updateCharLabel("", "include-char-counter");
+  updateCharLabel("", "exclude-char-counter");
+
+  // Setup the button state
+  if (debounceToggle.checked) {
+    setButtonAuto();
+  } else {
+    setButtonGenerate();
+  }
+};
