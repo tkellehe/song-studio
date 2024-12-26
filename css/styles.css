@@ -1,0 +1,187 @@
+/* General reset */
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Box-sizing: border-box globally */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* Header styles */
+header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+header img {
+  width: 50px;
+  height: 50px;
+}
+
+header h1 {
+  font-size: 2rem;
+}
+
+/* Input row container */
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* small gap */
+  width: 90%;
+  max-width: 600px;
+  margin-bottom: 15px;
+}
+
+/* Textarea container */
+.container {
+  width: 90%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.textarea-container {
+  position: relative;
+}
+
+/* Textarea styling */
+textarea {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid;
+  border-image-slice: 1;
+  border-width: 4px;
+  border-image-source: linear-gradient(45deg, #06b6d4, #ec4899);
+  border-radius: 5px;
+  background-color: #1e1e1e;
+  color: #ffffff;
+  resize: none;
+  font-size: 1rem;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 10px #06b6d4;
+}
+
+/* Character count label in bottom-right */
+.char-label {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  font-size: 0.8rem;
+  color: #888;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Input styling */
+input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  font-size: 1rem;
+  border: 2px solid #06b6d4;
+  border-radius: 5px;
+  background-color: #1e1e1e;
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  box-shadow: 0 0 10px #06b6d4;
+}
+
+/* Toggle switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 25px;
+  flex-shrink: 0;
+}
+
+/* Hide default checkbox */
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #555; /* Off state */
+  transition: 0.4s;
+  border-radius: 25px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 19px;
+  width: 19px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+/* Toggle ON style */
+.toggle-switch input:checked + .slider {
+  background: linear-gradient(45deg, #06b6d4, #ec4899);
+}
+
+.toggle-switch input:checked + .slider:before {
+  transform: translateX(25px);
+}
+
+/* Button styling */
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: 1rem;
+  border: 2px solid #06b6d4;
+  border-radius: 5px;
+  background: linear-gradient(45deg, #06b6d4, #ec4899);
+  color: #ffffff;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background 0.2s, color 0.2s, opacity 0.2s;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+/* Disabled/Auto states */
+.btn-disabled {
+  background: #444 !important;
+  color: #aaa !important;
+  border: 2px solid #444 !important;
+  cursor: default !important;
+  opacity: 1 !important;
+}
