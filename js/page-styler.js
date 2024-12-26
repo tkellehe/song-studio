@@ -168,3 +168,6 @@ window.onload = async () => {
     setButtonGenerate();
   }
 };
+
+// Export the getSongStyles function to be used in the browser.
+export getSongStyles;
