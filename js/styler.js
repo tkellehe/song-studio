@@ -229,7 +229,7 @@ export async function getSongStyles(text) {
   const scores = values.arraySync();
   
   // Convert indices to real descriptors
-  const sorted = indices.arraySync().map(i => { return { descriptor: descriptorArray[i], score: scores[i] } });
+  const sorted = indices.arraySync().map((i, index) => { return { descriptor: descriptorArray[i], score: scores[index] } });
 
   // Clean up the resources in tfjs
   values.dispose();
