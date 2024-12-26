@@ -16,6 +16,10 @@ const generateButton = document.getElementById("generate-button");
 const promptInput = document.getElementById("prompt-input");
 const debounceToggle = document.getElementById("debounce-toggle");
 
+// New copy buttons
+const includeCopyBtn = document.getElementById("include-copy");
+const excludeCopyBtn = document.getElementById("exclude-copy");
+
 /**
  * Update the "XX/200" label for a given textarea.
  */
@@ -118,6 +122,30 @@ debounceToggle.addEventListener("change", () => {
   } else {
     setButtonGenerate();
   }
+});
+
+/**
+ * Copy button functionality
+ */
+function copyToClipboard(textareaId, buttonEl) {
+  const textToCopy = document.getElementById(textareaId).value;
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    // Temporarily change button text to "Copied"
+    const originalText = buttonEl.innerText;
+    buttonEl.innerText = "Copied";
+    setTimeout(() => {
+      buttonEl.innerText = originalText;
+    }, 2000);
+  });
+}
+
+// Attach event listeners for copy buttons
+includeCopyBtn.addEventListener("click", () => {
+  copyToClipboard("include-tags", includeCopyBtn);
+});
+
+excludeCopyBtn.addEventListener("click", () => {
+  copyToClipboard("exclude-tags", excludeCopyBtn);
 });
 
 /**
