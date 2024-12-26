@@ -100,7 +100,7 @@ function buildDescriptorStrings(descriptorArray) {
   const finalStrings = [];
 
   for (let i = 0; i < descriptorArray.length; i++) {
-    const descriptor = descriptorArray[i];
+    const descriptor = descriptorArray[i].descriptor;
     const { category, group, tag } = descriptor;
     
     const groupKey = `${category}::${group}`;
@@ -217,21 +217,26 @@ function buildDescriptorStrings(descriptorArray) {
 
 /**
  * Renamed function: "getSongStyles"
- * Returns { include: [...], exclude: [...] } 
+ * Returns { include: [...], exclude: [...], sorted: [...] } 
  * based on descriptor similarity to the prompt text.
  */
 export async function getSongStyles(text) {
   const descriptorArray = await loadDescriptors();
   const embedding = await getEmbedding(text);
   const { values, indices } = await queryDescriptors(embedding);
-  
-  // We don’t actually use 'values' for anything
-  values.dispose();
 
+  // Grab all of the similarity scores
+  const scores = values.arraySync();
+  
   // Convert indices to real descriptors
-  const sorted = indices.arraySync().map(i => descriptorArray[i]);
+  const sorted = indices.arraySync().map(i => { descriptor: descriptorArray[i], score: scores[i] });
+
+  // Clean up the resources in tfjs
+  values.dispose();
+  indices.dispose();
 
   return {
+    sorted,
     include: buildDescriptorStrings(sorted.slice(0, 100)),
     exclude: buildDescriptorStrings(sorted.slice(-100).reverse()),
   };
