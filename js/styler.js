@@ -225,19 +225,50 @@ export async function getSongStyles(text) {
   const embedding = await getEmbedding(text);
   const { values, indices } = await queryDescriptors(embedding);
 
-  // Grab all of the similarity scores
+  // Grab all similarity scores
   const scores = values.arraySync();
-  
-  // Convert indices to real descriptors
-  const sorted = indices.arraySync().map((i, index) => { return { descriptor: descriptorArray[i], score: scores[index] } });
+
+  // Convert indices to real descriptors (sorted descending by default)
+  const sorted = indices.arraySync().map((i, index) => ({
+    descriptor: descriptorArray[i],
+    score: scores[index]
+  }));
 
   // Clean up the resources in tfjs
   values.dispose();
   indices.dispose();
 
+  // Define thresholds relative to the top score
+  const topScore = sorted[0].score;
+  const includeThreshold = topScore - 0.02;
+  const excludeThreshold = topScore - 0.045;
+
+  // 1) Find where scores drop below the include threshold:
+  //    i.e., the first index where score < includeThreshold.
+  let endIncludeIndex = sorted.findIndex(d => d.score < includeThreshold);
+
+  // If none found, .findIndex() returns -1 => means all are above the threshold.
+  if (endIncludeIndex === -1) {
+    endIncludeIndex = sorted.length;
+  }
+
+  // 2) Find where scores drop below (or equal to) the exclude threshold:
+  //    i.e., the first index where score <= excludeThreshold.
+  let startExcludeIndex = sorted.findIndex(d => d.score <= excludeThreshold);
+
+  // If none found, .findIndex() returns -1 => means none qualify for exclusion threshold.
+  if (startExcludeIndex === -1) {
+    startExcludeIndex = sorted.length;
+  }
+
+  // Use slice to grab the portion we want for “include” and “exclude”.
+  const includeArray = sorted.slice(0, endIncludeIndex);
+  const excludeArray = sorted.slice(startExcludeIndex);
+
   return {
     sorted,
-    include: buildDescriptorStrings(sorted.slice(0, 100)),
-    exclude: buildDescriptorStrings(sorted.slice(-100).reverse()),
+    include: buildDescriptorStrings(includeArray),
+    exclude: buildDescriptorStrings(excludeArray),
   };
 }
+
