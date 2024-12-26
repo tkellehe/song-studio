@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Song Studio - Styler</title>
+  <title>Song Studio - Styler (ES Modules)</title>
   
   <!-- External CSS -->
   <link rel="stylesheet" href="css/styles.css" />
-  
+
   <!-- TensorFlow.js and USE model scripts (still loaded from CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
@@ -45,7 +45,7 @@
     </label>
   </div>
 
-  <!-- Include/Exclude text areas -->
+  <!-- Include/Exclude text areas (with .textarea-container for char labels) -->
   <div class="container">
     <div class="textarea-container">
       <textarea
@@ -68,10 +68,11 @@
     </div>
   </div>
 
-  <!-- Your Styler logic -->
-  <script src="js/styler.js"></script>
-
-  <!-- Page logic that uses the styler logic -->
-  <script src="js/page-styler.js"></script>
+  <!-- 
+       1) We do NOT load "styler.js" directly as a separate script here.
+       2) We load "page-styler.js" as a module. 
+          It will IMPORT from styler.js. 
+  -->
+  <script type="module" src="js/page-styler.js"></script>
 </body>
 </html>
