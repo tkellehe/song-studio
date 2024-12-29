@@ -188,19 +188,28 @@ button:hover {
 
 /* Copy button inside the textarea container */
 .copy-button {
+  /* Positioning inside the .textarea-container */
   position: absolute;
   top: 5px;
   right: 5px;
-  background-color: rgba(255, 255, 255, 0.2);
+
+  /* Subtle background and border */
+  background-color: #333;          /* Dark gray */
+  border: 1px solid #555;         /* Slightly darker border */
+  border-radius: 4px;
+
+  /* Font and spacing */
+  font-size: 0.85rem;
   color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 5px 10px;
-  font-size: 0.9rem;
+  padding: 5px 8px;
   cursor: pointer;
-  transition: opacity 0.2s;
+
+  /* Smooth transitions */
+  transition: background-color 0.2s, color 0.2s;
 }
 
+/* Hover effect for copy button */
 .copy-button:hover {
-  opacity: 0.8;
+  background-color: #444;
+  color: #ffffff;
 }
