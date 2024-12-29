@@ -93,25 +93,6 @@ textarea:focus {
   user-select: none;
 }
 
-/* Copy button inside the textarea container */
-.copy-button {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background-color: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 5px 10px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.copy-button:hover {
-  opacity: 0.8;
-}
-
 /* Input styling */
 input[type="text"] {
   flex: 1;
@@ -203,4 +184,23 @@ button:hover {
   border: 2px solid #444 !important;
   cursor: default !important;
   opacity: 1 !important;
+}
+
+/* Copy button inside the textarea container */
+.copy-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.copy-button:hover {
+  opacity: 0.8;
 }
