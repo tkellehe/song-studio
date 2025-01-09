@@ -1,176 +1,134 @@
-// Basic audio object
+// Audio, AudioContext, and analyzer
 let audio = new Audio();
+let audioContext = null;
+let sourceNode = null;
+let analyser = null;
+let dataArray = null;
+let animationId = null;
+
 let isPlaying = false;
 
 // DOM references
-const loadSongButton = document.getElementById("load-song-button");
-const sunoLinkInput = document.getElementById("suno-link-input");
-const songCoverImg = document.getElementById("song-cover");
-const songTitleEl = document.getElementById("song-title");
+const fileStatus = document.getElementById("file-status");
+const audioFileInput = document.getElementById("audio-file-input");
+const canvas = document.getElementById("sonogram-canvas");
+const canvasCtx = canvas.getContext("2d");
 const playPauseButton = document.getElementById("play-pause-button");
 
-const sonogramContainer = document.getElementById("sonogram-container");
-const audioFileInput = document.getElementById("audio-file-input");
-
-// Create Two.js instance to draw the wave/sonogram.
-const twoParams = {
-  width: sonogramContainer.clientWidth,
-  height: sonogramContainer.clientHeight
-};
-let two = new Two(twoParams).appendTo(sonogramContainer);
-
 /**
- * Attempt to load a track from the Suno AI link (dummy logic).
- * In a real scenario, you'd fetch actual metadata, 
- * cover image, audio, etc.
+ * Set up or reuse the AudioContext and AnalyserNode.
+ * We connect the <audio> element to the Analyser so we can get time-domain data.
  */
-async function loadSongFromSunoLink(link) {
-  // Example placeholder logic (fake data):
-  const fakeSongResponse = {
-    title: "Sample Title from Suno Link",
-    cover: "https://via.placeholder.com/150/06b6d4/ec4899?text=Suno+Song",
-    audioUrl: "https://example.com/your-audio-file.mp3" // Replace with real audio
-  };
+function initAudioContext() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (sourceNode) {
+    sourceNode.disconnect();
+  }
+  sourceNode = audioContext.createMediaElementSource(audio);
 
-  // Update UI
-  songCoverImg.src = fakeSongResponse.cover;
-  songTitleEl.textContent = fakeSongResponse.title;
+  // Create an analyser node
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = 2048; // or 1024, etc.
+  let bufferLength = analyser.frequencyBinCount;
+  dataArray = new Uint8Array(bufferLength);
 
-  // Load the audio
-  audio.src = fakeSongResponse.audioUrl;
-  audio.load();
-
-  // Clear old waveforms or shapes and draw a new "splatter"
-  drawSonogramWave();
+  // Connect the source -> analyser -> destination
+  sourceNode.connect(analyser);
+  analyser.connect(audioContext.destination);
 }
 
 /**
- * Draw a fancy "splatter-like" wave. 
- * You can replace this with real analysis of your audio file 
- * if you want a more accurate sonogram.
+ * The main animation loop to draw the waveform in real-time.
  */
-function drawSonogramWave() {
-  // Clear previous shapes from the Two.js scene
-  two.clear();
+function drawWaveform() {
+  if (!analyser) return;
 
-  // Create a gradient fill for the wave
-  const gradient = two.makeLinearGradient(
-    0, 0,
-    0, two.height,
-    new Two.Stop(0, "#06b6d4"),
-    new Two.Stop(1, "#ec4899")
-  );
+  // requestAnimationFrame to repeatedly call drawWaveform
+  animationId = requestAnimationFrame(drawWaveform);
 
-  // We'll create some random "splatter" circles or arcs in the top half
-  const group = new Two.Group();
-  for (let i = 0; i < 15; i++) {
-    let x = Math.random() * two.width;
-    let y = (Math.random() * two.height) / 2; // restrict to top half
-    let radius = 20 + Math.random() * 30;
-    let circle = two.makeCircle(x, y, radius);
-    circle.fill = gradient;
-    circle.noStroke();
-    group.add(circle);
+  // Retrieve time-domain data
+  analyser.getByteTimeDomainData(dataArray);
+
+  // Clear canvas
+  canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw a simple line-based waveform
+  canvasCtx.lineWidth = 2;
+  canvasCtx.strokeStyle = "#06b6d4"; // teal-ish from your theme
+  canvasCtx.beginPath();
+
+  let sliceWidth = canvas.width * 1.0 / dataArray.length;
+  let x = 0;
+
+  for (let i = 0; i < dataArray.length; i++) {
+    let v = dataArray[i] / 128.0;
+    let y = (v * canvas.height) / 2;
+
+    if (i === 0) {
+      canvasCtx.moveTo(x, y);
+    } else {
+      canvasCtx.lineTo(x, y);
+    }
+    x += sliceWidth;
   }
 
-  // Add a draggable "dot" to represent current playback position
-  const dot = two.makeCircle(two.width / 2, two.height / 4, 8);
-  dot.fill = "#fff";
-  dot.noStroke();
-  dot._isDraggable = true; // custom property for tracking
-  group.add(dot);
-
-  let dragging = false;
-
-  sonogramContainer.addEventListener("mousedown", (e) => {
-    const rect = sonogramContainer.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const dist = Math.hypot(mouseX - dot.translation.x, mouseY - dot.translation.y);
-    if (dist <= 12) {
-      dragging = true;
-    }
-  });
-
-  sonogramContainer.addEventListener("mousemove", (e) => {
-    if (!dragging) return;
-    const rect = sonogramContainer.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    // clamp Y to top half
-    const clampedY = Math.max(0, Math.min(two.height / 2, e.clientY - rect.top));
-    dot.translation.set(mouseX, clampedY);
-
-    // Update audio currentTime if you want to allow scrubbing:
-    // let progress = dot.translation.x / two.width;
-    // audio.currentTime = progress * audio.duration;
-  });
-
-  sonogramContainer.addEventListener("mouseup", () => {
-    dragging = false;
-  });
-
-  // Add the group to the Two.js scene
-  two.add(group);
-
-  // Render the initial state
-  two.update();
+  canvasCtx.lineTo(canvas.width, canvas.height / 2);
+  canvasCtx.stroke();
 }
 
 /**
- * Toggle play/pause for the loaded track.
+ * Play/pause toggle
  */
 function togglePlayPause() {
   if (!audio.src) return; // no audio loaded
 
+  // Must resume AudioContext if it's suspended
+  if (audioContext && audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+
   if (isPlaying) {
     audio.pause();
-    playPauseButton.textContent = "Play";
+    cancelAnimationFrame(animationId);
+    playPauseButton.textContent = "▶"; // play icon
   } else {
     audio.play();
-    playPauseButton.textContent = "Pause";
+    drawWaveform(); // start animation
+    playPauseButton.textContent = "⏸"; // pause icon
   }
   isPlaying = !isPlaying;
 }
 
 /**
- * Handle local file selection (e.g., a WAV file).
+ * Handle file selection
  */
 audioFileInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  // Create a blob URL for the file so we can load it into the Audio object
+  // Display the file name above the canvas
+  fileStatus.textContent = file.name;
+
+  // Create a blob URL for the file
   const objectURL = URL.createObjectURL(file);
 
-  // Update the UI (generic placeholder)
-  songCoverImg.src = "../assets/note-gradient-icon.svg"; // or your own default cover
-  songTitleEl.textContent = file.name || "Untitled";
-
-  // Set audio source to the user-chosen file
+  // Reset audio and context
   audio.src = objectURL;
   audio.load();
 
-  // Redraw the sonogram
-  drawSonogramWave();
+  // Initialize or reuse AudioContext & Analyser
+  initAudioContext();
+
+  // Stop any ongoing playback if needed
+  audio.pause();
+  cancelAnimationFrame(animationId);
+  isPlaying = false;
+  playPauseButton.textContent = "▶";
 });
 
 /**
- * Event Listeners
+ * The play/pause button
  */
-loadSongButton.addEventListener("click", () => {
-  const link = sunoLinkInput.value.trim();
-  if (!link) return;
-  loadSongFromSunoLink(link);
-});
-
-playPauseButton.addEventListener("click", () => {
-  togglePlayPause();
-});
-
-/**
- * (Optional) track timeupdate to move the dot or change color
- * audio.addEventListener('timeupdate', () => {
- *   const progress = audio.currentTime / audio.duration;
- *   dot.translation.x = progress * two.width;
- * });
- */
+playPauseButton.addEventListener("click", togglePlayPause);
