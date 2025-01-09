@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Song Studio - Visualizer</title>
 
-  <!-- Example: reusing your main styles or reference them directly -->
+  <!-- Basic theme CSS (if you have one) -->
   <link rel="stylesheet" href="../css/styles.css" />
-  <!-- Additional local style overrides -->
+  <!-- Local overrides -->
   <link rel="stylesheet" href="visualizer.css" />
-  
+
   <script type="module" src="visualizer.js"></script>
 </head>
 <body>
@@ -18,25 +18,27 @@
     <h1>Song Studio - Visualizer</h1>
   </header>
 
-  <!-- File name or status above the sonogram -->
+  <!-- Current file name or status -->
   <div class="file-status" id="file-status">No audio loaded</div>
 
-  <!-- Sonogram container with the overlay upload button in the top-right -->
-  <div class="sonogram-container">
-    <!-- The canvas for drawing the waveform -->
-    <canvas id="sonogram-canvas" width="600" height="200"></canvas>
+  <!-- TOP CANVAS: "Spectrogram" with draggable dot + time display -->
+  <div class="canvas-container">
+    <canvas id="spectrogram-canvas" width="600" height="120"></canvas>
+    <!-- Time display in bottom-right corner -->
+    <div class="time-display" id="spectrogram-time">0:00 / 0:00</div>
+    <!-- Draggable dot overlay -->
+    <div class="draggable-dot" id="playback-dot"></div>
 
-    <!-- Hidden file input for uploading audio -->
-    <input 
-      type="file" 
-      id="audio-file-input" 
+    <!-- Hidden file input for audio -->
+    <input
+      type="file"
+      id="audio-file-input"
       accept="audio/*"
       style="display: none;"
     />
-    <!-- Label that triggers the file input. 
-         We position it in the top-right corner of the container. -->
+    <!-- Small overlay button for uploading -->
     <label for="audio-file-input" class="upload-button" title="Upload an audio file">
-      <!-- You can swap this with your preferred icon or text -->
+      <!-- Simple icon (SVG) or text -->
       <svg viewBox="0 0 24 24" fill="currentColor">
         <path d="M19.35 10.04c.68 0 1.36-.06 
           2.04-.16v8.52c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V5.99
@@ -47,12 +49,11 @@
     </label>
   </div>
 
+  <!-- BOTTOM CANVAS: "Sonogram" (real-time waveform) -->
+  <div class="canvas-container">
+    <canvas id="sonogram-canvas" width="600" height="120"></canvas>
+  </div>
+
   <!-- Centered play/pause button -->
   <div class="playback-controls">
-    <button id="play-pause-button" title="Play/Pause">
-      <!-- Default to 'play' icon: -->
-      ▶
-    </button>
-  </div>
-</body>
-</html>
+    <button id="play-p
