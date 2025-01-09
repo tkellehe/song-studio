@@ -1,19 +1,19 @@
 /****************************************************/
-/* Basic layout, reusing your theme's background, etc. */
+/* Basic layout, reusing your theme if you wish     */
 /****************************************************/
 body {
-  /* You might already have a background and color defined 
-     in your main styles.css. We'll assume a dark background. */
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0; /* override if needed */
-  padding: 0; /* override if needed */
+  margin: 0;
+  padding: 0;
   color: #ffffff;
   background-color: #121212;
   min-height: 100vh;
+  font-family: Arial, sans-serif;
 }
 
+/* Header */
 header {
   display: flex;
   align-items: center;
@@ -28,10 +28,13 @@ header img {
 }
 
 header h1 {
-  font-size: 1.8rem;
   margin: 0;
+  font-size: 1.8rem;
 }
 
+/****************************************************/
+/* File status                                      */
+/****************************************************/
 .file-status {
   margin-bottom: 10px;
   font-size: 1rem;
@@ -39,38 +42,68 @@ header h1 {
 }
 
 /****************************************************/
-/* Sonogram container and canvas                    */
+/* Canvas containers                                */
 /****************************************************/
-.sonogram-container {
-  position: relative; /* so we can position the upload button */
-  border: 2px solid #06b6d4;
+.canvas-container {
+  position: relative;
+  border: 2px solid #06b6d4; /* Teal border from your theme */
   border-radius: 8px;
   overflow: hidden;
-  /* Adjust width for responsiveness */
   width: 600px;
   max-width: 90%;
   margin-bottom: 20px;
-}
-
-/* The canvas will fill the container’s width. 
-   We set a fixed height in HTML. 
-   If you want a flexible height, you can do so with JS. */
-#sonogram-canvas {
-  display: block;
-  width: 100%;
-  height: auto; /* keep aspect ratio if you want */
   background-color: #1e1e1e;
 }
 
+canvas {
+  display: block;
+  width: 100%;
+  height: auto; /* keep aspect ratio or you can fix height if you prefer */
+}
+
 /****************************************************/
-/* Upload button (overlay, top-right corner)        */
+/* Time display in bottom-right of spectrogram canvas */
+/****************************************************/
+.time-display {
+  position: absolute;
+  bottom: 5px;
+  right: 8px;
+  font-size: 0.85rem;
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/****************************************************/
+/* Draggable dot (playback marker)                  */
+/****************************************************/
+.draggable-dot {
+  position: absolute;
+  top: 50%; /* We'll set actual position in JS */
+  left: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: #ec4899; /* Pink from gradient theme */
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.draggable-dot:hover {
+  background-color: #ff65b7;
+}
+
+/****************************************************/
+/* Upload button (top-right corner of .canvas-container) */
 /****************************************************/
 .upload-button {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
   display: flex;
   cursor: pointer;
   align-items: center;
@@ -85,31 +118,4 @@ header h1 {
 }
 
 .upload-button svg {
-  width: 20px;
-  height: 20px;
-  fill: #fff; /* Icon color */
-}
-
-/****************************************************/
-/* Playback controls (button)                       */
-/****************************************************/
-.playback-controls {
-  display: flex;
-  justify-content: center; /* center the button horizontally */
-  margin-bottom: 40px;     /* space from bottom if needed */
-}
-
-#play-pause-button {
-  font-size: 1.5rem;
-  padding: 10px 16px;
-  border: 2px solid #06b6d4;
-  border-radius: 5px;
-  background: linear-gradient(45deg, #06b6d4, #ec4899);
-  color: #ffffff;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-#play-pause-button:hover {
-  opacity: 0.85;
-}
+  width: 16
