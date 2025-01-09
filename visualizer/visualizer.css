@@ -118,4 +118,31 @@ canvas {
 }
 
 .upload-button svg {
-  width: 16
+  width: 16px;
+  height: 16px;
+  fill: #fff; /* Icon color */
+}
+
+/****************************************************/
+/* Playback controls (centered)                     */
+/****************************************************/
+.playback-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+#play-pause-button {
+  font-size: 1.5rem;
+  padding: 10px 16px;
+  border: 2px solid #06b6d4;
+  border-radius: 5px;
+  background: linear-gradient(45deg, #06b6d4, #ec4899);
+  color: #ffffff;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+#play-pause-button:hover {
+  opacity: 0.85;
+}
