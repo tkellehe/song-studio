@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Song Studio - Visualizer</title>
+
+  <!-- Favicon (assuming the same icon in assets/) -->
+  <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+
+  <!-- Reuse the same external CSS from your root or create a new one if needed -->
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="visualizer.css" />
+
+  <!-- Two.js library (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/two.js@latest/dist/two.min.js"></script>
+
+  <!-- Main Visualizer JavaScript -->
+  <script type="module" src="visualizer.js"></script>
+</head>
+
+<body>
+  <header>
+    <img src="../assets/note-gradient-icon.svg" alt="Note Icon" />
+    <h1>Song Studio - Visualizer</h1>
+  </header>
+
+  <div class="visualizer-container">
+    <!-- A row for entering a Suno link (optional) and loading it -->
+    <div class="input-row">
+      <input
+        type="text"
+        id="suno-link-input"
+        placeholder="Paste your Suno AI song link here (optional)"
+        title="Enter the Suno AI link to visualize"
+      />
+      <button id="load-song-button" title="Load Song from Suno Link">
+        Load
+      </button>
+    </div>
+
+    <!-- Song info (cover image + title) -->
+    <div class="song-info">
+      <img id="song-cover" src="" alt="Song Cover" />
+      <h2 id="song-title">No song loaded</h2>
+    </div>
+
+    <!-- The main canvas area (Two.js will draw here).
+         Upload button is positioned in the top-right corner. -->
+    <div id="sonogram-container">
+      <!-- Hidden file input (triggered by the label), 
+           restricted to audio/* or specifically .wav if you wish -->
+      <input 
+        type="file" 
+        id="audio-file-input" 
+        accept="audio/*" 
+        style="display: none;" 
+      />
+      <!-- The label acts as a button with an icon. Clicking it opens the file dialog. -->
+      <label for="audio-file-input" class="upload-label" title="Upload an audio file (e.g., .wav)">
+        <!-- You could replace this inline SVG with your own or with a Font Awesome icon. -->
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.35 10.04c.68 0 1.36-.06 2.04-.16v8.52c0 
+            1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V5.99c0-1.1.9-2 
+            2-2h7.52c-.2.63-.32 1.3-.36 2H4v12h16v-7.96c-.21.01-.42.01-.65.01zM12 
+            0l4.29 4.29-1.42 1.42L13 4.83V15h-2V4.83L9.12 
+            5.71 7.71 4.29 12 0z"/>
+        </svg>
+      </label>
+    </div>
+
+    <!-- Playback controls -->
+    <div class="playback-controls">
+      <button id="play-pause-button">Play</button>
+    </div>
+  </div>
+</body>
+</html>
