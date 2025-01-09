@@ -1,97 +1,115 @@
 /****************************************************/
-/* Inherits base styles from ../css/styles.css      */
+/* Basic layout, reusing your theme's background, etc. */
 /****************************************************/
-
-.visualizer-container {
+body {
+  /* You might already have a background and color defined 
+     in your main styles.css. We'll assume a dark background. */
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 90%;
-  max-width: 800px;
-  margin: 0 auto;
+  margin: 0; /* override if needed */
+  padding: 0; /* override if needed */
+  color: #ffffff;
+  background-color: #121212;
+  min-height: 100vh;
 }
 
-.input-row {
-  margin-bottom: 20px;
-}
-
-/****************************************************/
-/* Song info                                        */
-/****************************************************/
-.song-info {
+header {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
+  margin-top: 20px;
   margin-bottom: 20px;
 }
 
-.song-info img {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  object-fit: cover;
-  border: 2px solid #06b6d4;
+header img {
+  width: 50px;
+  height: 50px;
 }
 
-.song-info h2 {
-  font-size: 1.25rem;
-  color: #ffffff;
+header h1 {
+  font-size: 1.8rem;
   margin: 0;
 }
 
-/****************************************************/
-/* Sonogram container                               */
-/****************************************************/
-#sonogram-container {
-  width: 100%;
-  height: 300px;
-  position: relative;
-  background-color: #1e1e1e;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  overflow: hidden; /* Hide overdraw from shapes */
-  margin-bottom: 20px;
+.file-status {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #ccc;
 }
 
 /****************************************************/
-/* Upload label (positioned top-right)              */
+/* Sonogram container and canvas                    */
 /****************************************************/
-.upload-label {
+.sonogram-container {
+  position: relative; /* so we can position the upload button */
+  border: 2px solid #06b6d4;
+  border-radius: 8px;
+  overflow: hidden;
+  /* Adjust width for responsiveness */
+  width: 600px;
+  max-width: 90%;
+  margin-bottom: 20px;
+}
+
+/* The canvas will fill the container’s width. 
+   We set a fixed height in HTML. 
+   If you want a flexible height, you can do so with JS. */
+#sonogram-canvas {
+  display: block;
+  width: 100%;
+  height: auto; /* keep aspect ratio if you want */
+  background-color: #1e1e1e;
+}
+
+/****************************************************/
+/* Upload button (overlay, top-right corner)        */
+/****************************************************/
+.upload-button {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 8px;
+  right: 8px;
   width: 32px;
   height: 32px;
   display: flex;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-
-  /* Reuse gradient from your theme or just keep white color */
   background: linear-gradient(45deg, #06b6d4, #ec4899);
   border-radius: 4px;
   transition: opacity 0.2s;
 }
 
-.upload-label:hover {
+.upload-button:hover {
   opacity: 0.85;
 }
 
-.upload-label svg {
+.upload-button svg {
   width: 20px;
   height: 20px;
   fill: #fff; /* Icon color */
 }
 
 /****************************************************/
-/* Playback controls                                */
+/* Playback controls (button)                       */
 /****************************************************/
 .playback-controls {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  justify-content: center; /* center the button horizontally */
+  margin-bottom: 40px;     /* space from bottom if needed */
 }
 
 #play-pause-button {
-  min-width: 80px;
+  font-size: 1.5rem;
+  padding: 10px 16px;
+  border: 2px solid #06b6d4;
+  border-radius: 5px;
+  background: linear-gradient(45deg, #06b6d4, #ec4899);
+  color: #ffffff;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+#play-pause-button:hover {
+  opacity: 0.85;
 }
