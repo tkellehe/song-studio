@@ -1,5 +1,5 @@
 /****************************************************/
-/* Basic layout, reusing your theme if you wish     */
+/* Basic layout                                     */
 /****************************************************/
 body {
   display: flex;
@@ -141,6 +141,8 @@ canvas {
   color: #ffffff;
   cursor: pointer;
   transition: opacity 0.2s;
+  width: 60px;
+  height: 60px;
 }
 
 #play-pause-button:hover {
